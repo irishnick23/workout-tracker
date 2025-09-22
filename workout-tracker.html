@@ -449,11 +449,12 @@
             currentWorkout: null,
             workoutResults: {},
             sessionCount: 0,
+            weekNumber: 1,
+            weeklyResults: {}, // Track exercise results per week
+            consecutiveFailures: {}, // Track consecutive failures per exercise
             rdlWeeksSinceIncrease: 0,
-            stallState: {}, // Track stall interventions per exercise
-            microResetActive: {}, // Track if exercise is in micro-reset mode
-            deloadCount: {}, // Track how many times exercise done during deload
-            originalFailedWeight: {} // Track weight that failed before deload
+            isDeloadWeek: false,
+            lastSuccessfulWeights: { ...INITIAL_WEIGHTS }
         };
 
         // Load state from localStorage
@@ -464,10 +465,9 @@
                 appState = {
                     ...appState,
                     ...savedState,
-                    stallState: savedState.stallState || {},
-                    microResetActive: savedState.microResetActive || {},
-                    deloadCount: savedState.deloadCount || {},
-                    originalFailedWeight: savedState.originalFailedWeight || {}
+                    weeklyResults: savedState.weeklyResults || {},
+                    consecutiveFailures: savedState.consecutiveFailures || {},
+                    lastSuccessfulWeights: savedState.lastSuccessfulWeights || { ...INITIAL_WEIGHTS }
                 };
             }
         }
@@ -545,96 +545,150 @@
             }
         }
 
-        // Calculate next weights based on progression rules
-        function calculateNextWeight(exercise, currentWeight, hit) {
-            if (!hit) return currentWeight; // Same weight if missed
+        // Get current week number (resets every 4 workouts)
+        function getCurrentWeek() {
+            return Math.floor(appState.sessionCount / 4) + 1;
+        }
 
-            switch (exercise) {
-                case 'deadlift':
-                case 'squat':
-                    // +10lb when crisp, +5lb when form gets grindy (simplified to always +10 for now)
-                    return currentWeight + 10;
+        // Check if we've completed the current week (all 4 workouts done)
+        function isWeekComplete() {
+            return appState.sessionCount % 4 === 0 && appState.sessionCount > 0;
+        }
 
-                case 'rdl':
-                    // +10lb every 2-3 weeks (track separately)
-                    appState.rdlWeeksSinceIncrease++;
-                    if (appState.rdlWeeksSinceIncrease >= 2) {
-                        appState.rdlWeeksSinceIncrease = 0;
-                        return currentWeight + 10;
-                    }
-                    return currentWeight;
+        // Calculate weekly progression for next week
+        function calculateWeeklyProgression() {
+            const currentWeek = getCurrentWeek();
 
-                case 'bench':
-                case 'ohp':
-                case 'row':
-                    return currentWeight + 5;
-
-                case 'pullups':
-                    return currentWeight + 5;
-
-                default:
-                    return currentWeight;
+            // Check if this is a new week
+            if (currentWeek > appState.weekNumber) {
+                processWeeklyResults();
+                appState.weekNumber = currentWeek;
+                appState.weeklyResults = {}; // Reset for new week
             }
         }
 
-        // Check for stalls and handle automatically
-        function checkAndHandleStalls() {
-            const recentHistory = appState.workoutHistory.slice(-8); // Last 8 workouts
-            const actions = [];
+        // Process results from completed week and set next week's weights
+        function processWeeklyResults() {
+            const weekResults = appState.weeklyResults;
+
+            // Check for deload trigger first
+            let needsDeload = false;
 
             for (const exercise of Object.keys(appState.currentWeights)) {
-                // Skip pull-ups from stall detection - they just keep trying the same weight
-                if (exercise === 'pullups') continue;
+                if (exercise === 'pullups') continue; // Pull-ups handled separately
 
-                const exerciseHistory = recentHistory
-                    .filter(workout => workout.results[exercise] !== undefined)
-                    .slice(-2); // Last 2 times this exercise was done
+                const results = weekResults[exercise] || [];
+                const allFailed = results.length > 0 && results.every(result => !result);
 
-                // Check if we have 2 consecutive misses
-                if (exerciseHistory.length === 2 &&
-                    exerciseHistory.every(w => !w.results[exercise])) {
-
-                    if (!appState.stallState[exercise]) {
-                        // First stall - initiate micro-reset
-                        appState.stallState[exercise] = 'micro-reset';
-                        appState.microResetActive[exercise] = true;
-                        actions.push(`${exercise}: Starting micro-reset (3×6)`);
-                        saveState(); // Save immediately
-                    } else if (appState.stallState[exercise] === 'micro-reset') {
-                        // Micro-reset failed - initiate deload
-                        // Store the original failed weight before deloading
-                        appState.originalFailedWeight[exercise] = appState.currentWeights[exercise];
-                        appState.stallState[exercise] = 'deload';
-                        appState.deloadCount[exercise] = 0; // Start counting deload instances
-                        // Round deload weight down to nearest 5 lbs
-                        const deloadWeight = appState.currentWeights[exercise] * 0.75;
-                        appState.currentWeights[exercise] = Math.floor(deloadWeight / 5) * 5;
-                        // Ensure we really got a proper 5lb increment
-                        if (appState.currentWeights[exercise] % 5 !== 0) {
-                            appState.currentWeights[exercise] = Math.floor(appState.currentWeights[exercise] / 5) * 5;
-                        }
-                        appState.microResetActive[exercise] = false;
-                        actions.push(`${exercise}: Micro-reset failed, deloading to ${appState.currentWeights[exercise]}lbs`);
-                        saveState(); // Save immediately
+                if (allFailed) {
+                    appState.consecutiveFailures[exercise] = (appState.consecutiveFailures[exercise] || 0) + 1;
+                    if (appState.consecutiveFailures[exercise] >= 2) {
+                        needsDeload = true;
                     }
+                } else if (results.some(result => result)) {
+                    // At least one success - reset failure count
+                    appState.consecutiveFailures[exercise] = 0;
+                    appState.lastSuccessfulWeights[exercise] = appState.currentWeights[exercise];
                 }
+            }
 
-                // Handle deload completion after 2 workouts containing this exercise
-                if (appState.stallState[exercise] === 'deload') {
-                    // Check if we've completed 2 workouts with this exercise since deload started
-                    if ((appState.deloadCount[exercise] || 0) >= 2) {
-                        // Deload week complete, return to original failed weight minus 5 lbs
-                        const originalWeight = appState.originalFailedWeight[exercise];
-                        const returnWeight = originalWeight - 5; // Start 5 lbs below where we failed
-                        appState.currentWeights[exercise] = returnWeight;
+            if (needsDeload) {
+                initiateDeloadWeek();
+            } else if (appState.isDeloadWeek) {
+                completeDeloadWeek();
+            } else {
+                progressWeights();
+            }
+        }
 
-                        delete appState.stallState[exercise];
-                        delete appState.deloadCount[exercise];
-                        delete appState.originalFailedWeight[exercise];
+        // Progress weights for next week
+        function progressWeights() {
+            const weekResults = appState.weeklyResults;
 
-                        actions.push(`${exercise}: Deload complete, returning to ${returnWeight}lbs (5 lbs below failed weight)`);
-                        saveState();
+            for (const exercise of Object.keys(appState.currentWeights)) {
+                const results = weekResults[exercise] || [];
+
+                // Only progress if ALL appearances were successful
+                const allSuccessful = results.length > 0 && results.every(result => result);
+
+                if (allSuccessful) {
+                    switch (exercise) {
+                        case 'deadlift':
+                        case 'squat':
+                            appState.currentWeights[exercise] += 10;
+                            break;
+
+                        case 'rdl':
+                            // Progress every 2-3 weeks only if successful
+                            appState.rdlWeeksSinceIncrease++;
+                            if (appState.rdlWeeksSinceIncrease >= 2) {
+                                appState.currentWeights[exercise] += 10;
+                                appState.rdlWeeksSinceIncrease = 0;
+                            }
+                            break;
+
+                        case 'bench':
+                        case 'ohp':
+                        case 'row':
+                            appState.currentWeights[exercise] += 5;
+                            break;
+
+                        case 'pullups':
+                            // Only progress if both sessions hit 3×8 strict
+                            appState.currentWeights[exercise] += 5;
+                            break;
                     }
+
+                    appState.lastSuccessfulWeights[exercise] = appState.currentWeights[exercise];
+                }
+                // If not all successful, weight stays the same (retry)
+            }
+        }
+
+        // Initiate deload week
+        function initiateDeloadWeek() {
+            appState.isDeloadWeek = true;
+
+            // All lifts drop to 75% rounded down to nearest 5
+            for (const exercise of Object.keys(appState.currentWeights)) {
+                const deloadWeight = appState.currentWeights[exercise] * 0.75;
+                appState.currentWeights[exercise] = Math.floor(deloadWeight / 5) * 5;
+            }
+
+            // Reset consecutive failures
+            appState.consecutiveFailures = {};
+        }
+
+        // Complete deload week and return to progression
+        function completeDeloadWeek() {
+            appState.isDeloadWeek = false;
+
+            // Return to last successful weights (or 5lbs below)
+            for (const exercise of Object.keys(appState.currentWeights)) {
+                appState.currentWeights[exercise] = Math.max(
+                    appState.lastSuccessfulWeights[exercise] - 5,
+                    45 // Minimum weight
+                );
+            }
+        }
+
+        // Check weekly status and provide feedback
+        function checkWeeklyStatus() {
+            const actions = [];
+
+            if (appState.isDeloadWeek) {
+                actions.push('Deload Week: All exercises at 75% weight');
+                // In deload week, replace heavy deadlift with RDL
+                if (getCurrentWorkoutType() === 'A_HEAVY') {
+                    actions.push('Using RDL instead of heavy deadlift this week');
+                }
+            }
+
+            // Check for consecutive failures that might trigger deload next week
+            for (const exercise of Object.keys(appState.consecutiveFailures)) {
+                const failures = appState.consecutiveFailures[exercise];
+                if (failures === 1) {
+                    actions.push(`${exercise}: One failure streak - needs success this week`);
                 }
             }
 
@@ -655,31 +709,38 @@
             exercisesDiv.innerHTML = '';
 
             workout.exercises.forEach(exercise => {
-                const weight = appState.currentWeights[exercise.key];
-                const weightDisplay = exercise.key === 'pullups'
+                // Handle deload week exercise substitution
+                let actualExercise = exercise;
+                if (appState.isDeloadWeek && exercise.key === 'deadlift') {
+                    // Replace heavy deadlift with RDL during deload week
+                    actualExercise = { name: 'Romanian Deadlift', key: 'rdl', sets: '3×8' };
+                }
+
+                const weight = appState.currentWeights[actualExercise.key];
+                const weightDisplay = actualExercise.key === 'pullups'
                     ? (weight === 0 ? 'Bodyweight' : `+${weight} lbs`)
                     : `${weight} lbs`;
 
-                const setsDisplay = appState.microResetActive[exercise.key] ? '3×6' : exercise.sets;
-                const exerciseInfo = EXERCISE_INFO[exercise.key];
-                const warmupSets = calculateWarmupSets(exercise.key, weight);
+                const setsDisplay = actualExercise.sets; // Always 3×8, no micro-reset
+                const exerciseInfo = EXERCISE_INFO[actualExercise.key];
+                const warmupSets = calculateWarmupSets(actualExercise.key, weight);
 
                 const exerciseDiv = document.createElement('section');
                 exerciseDiv.className = 'exercise';
-                exerciseDiv.setAttribute('aria-labelledby', `exercise-name-${exercise.key}`);
+                exerciseDiv.setAttribute('aria-labelledby', `exercise-name-${actualExercise.key}`);
 
                 // Build warmup section only if warmup sets exist
                 const warmupSection = warmupSets.length > 0 ? `
-                    <button class="warmup-toggle" id="warmup-toggle-${exercise.key}"
-                            onclick="toggleWarmup('${exercise.key}')"
-                            onkeydown="handleWarmupKeydown(event, '${exercise.key}')"
+                    <button class="warmup-toggle" id="warmup-toggle-${actualExercise.key}"
+                            onclick="toggleWarmup('${actualExercise.key}')"
+                            onkeydown="handleWarmupKeydown(event, '${actualExercise.key}')"
                             aria-expanded="false"
-                            aria-controls="warmup-${exercise.key}"
-                            aria-label="Show warmup instructions for ${exercise.name}">
+                            aria-controls="warmup-${actualExercise.key}"
+                            aria-label="Show warmup instructions for ${actualExercise.name}">
                         <span>Warmup</span>
                         <span class="warmup-caret" aria-hidden="true">⌄</span>
                     </button>
-                    <div class="warmup-content hidden" id="warmup-${exercise.key}" role="region" aria-labelledby="warmup-toggle-${exercise.key}">
+                    <div class="warmup-content hidden" id="warmup-${actualExercise.key}" role="region" aria-labelledby="warmup-toggle-${actualExercise.key}">
                         <div><strong>Warmup Sets:</strong></div>
                         <ul class="warmup-sets" role="list">
                             ${warmupSets.map(set => `<li class="warmup-set">${set}</li>`).join('')}
@@ -688,21 +749,21 @@
                 ` : '';
 
                 exerciseDiv.innerHTML = `
-                    <h3 class="exercise-name" id="exercise-name-${exercise.key}">${exercise.name}</h3>
+                    <h3 class="exercise-name" id="exercise-name-${actualExercise.key}">${actualExercise.name}</h3>
                     <div class="exercise-target" aria-label="Target: ${weightDisplay} for ${setsDisplay}">${weightDisplay} ${setsDisplay}</div>
-                    <div class="exercise-rest" id="rest-${exercise.key}" aria-label="Rest time: ${exerciseInfo.rest}">Rest: ${exerciseInfo.rest}</div>
+                    <div class="exercise-rest" id="rest-${actualExercise.key}" aria-label="Rest time: ${exerciseInfo.rest}">Rest: ${exerciseInfo.rest}</div>
                     ${warmupSection}
-                    <div class="exercise-buttons" role="group" aria-labelledby="exercise-name-${exercise.key}" aria-describedby="rest-${exercise.key}">
+                    <div class="exercise-buttons" role="group" aria-labelledby="exercise-name-${actualExercise.key}" aria-describedby="rest-${actualExercise.key}">
                         <button class="btn btn-success"
-                                onclick="logExercise('${exercise.key}', true)"
-                                onkeydown="handleExerciseKeydown(event, '${exercise.key}', true)"
-                                aria-label="Mark ${exercise.name} as completed successfully">
+                                onclick="logExercise('${actualExercise.key}', true)"
+                                onkeydown="handleExerciseKeydown(event, '${actualExercise.key}', true)"
+                                aria-label="Mark ${actualExercise.name} as completed successfully">
                             ✓ Hit Target
                         </button>
                         <button class="btn btn-miss"
-                                onclick="logExercise('${exercise.key}', false)"
-                                onkeydown="handleExerciseKeydown(event, '${exercise.key}', false)"
-                                aria-label="Mark ${exercise.name} as missed">
+                                onclick="logExercise('${actualExercise.key}', false)"
+                                onkeydown="handleExerciseKeydown(event, '${actualExercise.key}', false)"
+                                aria-label="Mark ${actualExercise.name} as missed">
                             ✗ Missed
                         </button>
                     </div>
@@ -710,22 +771,14 @@
                 exercisesDiv.appendChild(exerciseDiv);
             });
 
-            // Check for stalls and handle automatically
-            const stallInfo = checkAndHandleStalls();
-            if (stallInfo.actions.length > 0) {
-                showStallAlert(stallInfo.actions);
+            // Check weekly status and progression
+            calculateWeeklyProgression();
+            const statusInfo = checkWeeklyStatus();
+            if (statusInfo.actions.length > 0) {
+                showStallAlert(statusInfo.actions);
             } else {
                 document.getElementById('stall-alert').classList.add('hidden');
             }
-
-            // Also check current exercise for ongoing micro-reset
-            workout.exercises.forEach(exercise => {
-                if (appState.microResetActive[exercise.key]) {
-                    if (!stallInfo.actions.some(action => action.includes(exercise.key))) {
-                        showStallAlert([`${exercise.key}: Micro-reset active (3×6)`]);
-                    }
-                }
-            });
         }
 
         // Show stall alert with automatic actions
@@ -741,12 +794,12 @@
         function logExercise(exerciseKey, hit) {
             appState.workoutResults[exerciseKey] = hit;
 
-            // Handle micro-reset completion
-            if (appState.microResetActive[exerciseKey] && hit) {
-                // Micro-reset successful, clear stall state and return to 3×8
-                delete appState.stallState[exerciseKey];
-                appState.microResetActive[exerciseKey] = false;
+            // Track result for weekly progression
+            const currentWeek = getCurrentWeek();
+            if (!appState.weeklyResults[exerciseKey]) {
+                appState.weeklyResults[exerciseKey] = [];
             }
+            appState.weeklyResults[exerciseKey].push(hit);
 
             // Disable buttons for this exercise
             const exerciseDiv = event.target.closest('.exercise');
@@ -817,31 +870,22 @@
 
         // Complete workout
         function completeWorkout() {
-            // Track deload instances and update weights
-            appState.currentWorkout.exercises.forEach(exercise => {
-                const hit = appState.workoutResults[exercise.key];
-
-                // If exercise is in deload, increment counter
-                if (appState.stallState[exercise.key] === 'deload') {
-                    appState.deloadCount[exercise.key] = (appState.deloadCount[exercise.key] || 0) + 1;
-                }
-
-                // Only update weight if not in deload (deload maintains same weight)
-                if (appState.stallState[exercise.key] !== 'deload') {
-                    appState.currentWeights[exercise.key] = calculateNextWeight(exercise.key, appState.currentWeights[exercise.key], hit);
-                }
-            });
-
             // Save workout to history
             const workout = {
                 date: new Date().toISOString(),
                 type: getCurrentWorkoutType(),
-                results: { ...appState.workoutResults }
+                results: { ...appState.workoutResults },
+                weekNumber: getCurrentWeek()
             };
             appState.workoutHistory.push(workout);
 
             // Increment session count
             appState.sessionCount++;
+
+            // Check if week is complete and process results
+            if (isWeekComplete()) {
+                calculateWeeklyProgression();
+            }
 
             // Save state
             saveState();
@@ -970,10 +1014,10 @@
                 debugDiv.innerHTML = `
                     <strong>Current State:</strong><br>
                     Session Count: ${appState.sessionCount}<br>
-                    Stall States: ${JSON.stringify(appState.stallState)}<br>
-                    Micro-Reset Active: ${JSON.stringify(appState.microResetActive)}<br>
-                    Deload Count: ${JSON.stringify(appState.deloadCount)}<br>
-                    Original Failed Weights: ${JSON.stringify(appState.originalFailedWeight)}<br><br>
+                    Week Number: ${appState.weekNumber}<br>
+                    Is Deload Week: ${appState.isDeloadWeek}<br>
+                    Weekly Results: ${JSON.stringify(appState.weeklyResults)}<br>
+                    Consecutive Failures: ${JSON.stringify(appState.consecutiveFailures)}<br><br>
 
                     <strong>Recent History (last 4):</strong><br>
                     ${recentHistory.map((w, i) =>
@@ -1003,11 +1047,12 @@
                     currentWorkout: null,
                     workoutResults: {},
                     sessionCount: 0,
+                    weekNumber: 1,
+                    weeklyResults: {},
+                    consecutiveFailures: {},
                     rdlWeeksSinceIncrease: 0,
-                    stallState: {},
-                    microResetActive: {},
-                    deloadCount: {},
-                    originalFailedWeight: {}
+                    isDeloadWeek: false,
+                    lastSuccessfulWeights: { ...INITIAL_WEIGHTS }
                 };
 
                 // Save clean state
