@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Tracker</title>
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.5;
+            letter-spacing: -0.02em;
+            font-size: 98%;
+            font-weight: 400;
+        }
+
+        /* Focus indicators for accessibility */
+        *:focus {
+            outline: 2px solid #2563eb;
+            outline-offset: 2px;
+        }
+
+        button:focus {
+            outline: 2px solid #2563eb;
+            outline-offset: 2px;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 16px;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+            padding: 20px 0;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2563eb;
+        }
+
+        .nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-btn.active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+
+        .workout-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .workout-type {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            text-align: center;
+            color: #2563eb;
+        }
+
+        .exercise {
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .exercise:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .exercise-name {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .exercise-target {
+            font-size: 24px;
+            font-weight: 600;
+            color: #059669;
+            margin-bottom: 12px;
+        }
+
+        .exercise-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 54px;
+        }
+
+        .btn-success {
+            background: #059669;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #047857;
+        }
+
+        .btn-miss {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-miss:hover {
+            background: #b91c1c;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .progress-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .progress-item:last-child {
+            border-bottom: none;
+        }
+
+        .progress-date {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .progress-workout {
+            font-weight: 500;
+        }
+
+        .progress-status {
+            font-size: 20px;
+        }
+
+        .next-session {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .next-session h3 {
+            color: #92400e;
+            margin-bottom: 8px;
+        }
+
+        .stall-alert {
+            background: #fee2e2;
+            border: 1px solid #ef4444;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .stall-alert h3 {
+            color: #dc2626;
+            margin-bottom: 8px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2563eb;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .exercise-rest {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .warmup-toggle {
+            background: none;
+            border: none;
+            color: #374151;
+            font-size: 14px;
+            font-weight: 400;
+            cursor: pointer;
+            margin-bottom: 12px;
+            padding: 8px 0;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            text-align: left;
+        }
+
+        .warmup-toggle:hover {
+            color: #1f2937;
+        }
+
+        .warmup-toggle:active {
+            opacity: 0.7;
+        }
+
+        .warmup-caret {
+            font-size: 12px;
+            transition: transform 0.2s ease;
+            color: #9ca3af;
+            margin-left: auto;
+        }
+
+        .warmup-toggle.expanded .warmup-caret {
+            transform: rotate(180deg);
+        }
+
+        .warmup-content {
+            background: #f8fafc;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #64748b;
+            border-left: 3px solid #e2e8f0;
+        }
+
+        .warmup-content.hidden {
+            display: none;
+        }
+
+        .warmup-sets {
+            margin-top: 8px;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .warmup-set {
+            margin-bottom: 4px;
+            position: relative;
+            padding-left: 16px;
+        }
+
+        .warmup-set::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💪 Workout Tracker</h1>
+        </div>
+
+        <nav class="nav" role="navigation" aria-label="Main navigation">
+            <button class="nav-btn active" onclick="showSection('workout')" aria-pressed="true" aria-controls="workout-section">Workout</button>
+            <button class="nav-btn" onclick="showSection('progress')" aria-pressed="false" aria-controls="progress-section">Progress</button>
+        </nav>
+
+        <main id="workout-section" role="main">
+            <div id="stall-alert" class="stall-alert hidden" role="alert" aria-live="polite">
+                <h3>⚠️ Stall Detected</h3>
+                <p id="stall-message"></p>
+            </div>
+
+            <section class="workout-card" aria-labelledby="workout-type">
+                <h2 id="workout-type" class="workout-type">Workout A</h2>
+                <div id="exercises" role="group" aria-label="Exercise list"></div>
+            </section>
+
+            <div id="next-session" class="next-session hidden">
+                <h3>🎯 Next Session</h3>
+                <div id="next-session-content"></div>
+            </div>
+
+            <button id="complete-workout" class="btn btn-primary hidden" style="width: 100%; margin-top: 16px;" onclick="completeWorkout()" aria-label="Complete current workout and save results">
+                Complete Workout
+            </button>
+        </main>
+
+        <section id="progress-section" class="hidden" role="complementary" aria-label="Progress and statistics">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div id="total-workouts" class="stat-value">0</div>
+                    <div class="stat-label">Total Workouts</div>
+                </div>
+                <div class="stat-card">
+                    <div id="success-rate" class="stat-value">0%</div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
+            </div>
+
+            <div class="workout-card">
+                <h3 style="margin-bottom: 16px;">Recent History</h3>
+                <div id="history-list"></div>
+            </div>
+
+            <div class="workout-card">
+                <h3 style="margin-bottom: 16px;">Current Weights</h3>
+                <div id="current-weights"></div>
+            </div>
+
+            <div class="workout-card">
+                <h3 style="margin-bottom: 16px;">Debug Info</h3>
+                <button class="btn btn-primary" onclick="showDebugInfo()" style="width: 100%; margin-bottom: 10px;">Show Debug Info</button>
+                <button class="btn btn-miss" onclick="resetAllData()" style="width: 100%;">Reset All Data</button>
+                <div id="debug-info" style="margin-top: 10px; font-size: 12px; background: #f1f5f9; padding: 10px; border-radius: 4px; display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initial workout data based on your starting weights
+        const INITIAL_WEIGHTS = {
+            deadlift: 175,
+            rdl: 155,
+            squat: 135,
+            bench: 120,
+            ohp: 75,
+            row: 65,
+            pullups: 0 // Start with bodyweight
+        };
+
+        // Exercise rest times and warmup info
+        const EXERCISE_INFO = {
+            deadlift: { rest: '3-4 min', warmupType: 'barbell' },
+            rdl: { rest: '3-4 min', warmupType: 'barbell' },
+            squat: { rest: '3-4 min', warmupType: 'barbell' },
+            bench: { rest: '2-3 min', warmupType: 'barbell' },
+            ohp: { rest: '2-3 min', warmupType: 'barbell' },
+            row: { rest: '2-3 min', warmupType: 'barbell' },
+            pullups: { rest: '2-3 min', warmupType: 'bodyweight' }
+        };
+
+        // Workout definitions
+        const WORKOUTS = {
+            A_HEAVY: {
+                name: 'Workout A (Heavy Hinge)',
+                exercises: [
+                    { name: 'Deadlift', key: 'deadlift', sets: '3×8' },
+                    { name: 'Overhead Press', key: 'ohp', sets: '3×8' },
+                    { name: 'Barbell Row', key: 'row', sets: '3×8' }
+                ]
+            },
+            A_LIGHT: {
+                name: 'Workout A (Light Hinge)',
+                exercises: [
+                    { name: 'Romanian Deadlift', key: 'rdl', sets: '3×8' },
+                    { name: 'Overhead Press', key: 'ohp', sets: '3×8' },
+                    { name: 'Barbell Row', key: 'row', sets: '3×8' }
+                ]
+            },
+            B: {
+                name: 'Workout B',
+                exercises: [
+                    { name: 'Back Squat', key: 'squat', sets: '3×8' },
+                    { name: 'Bench Press', key: 'bench', sets: '3×8' },
+                    { name: 'Pull-Ups', key: 'pullups', sets: '3×8' }
+                ]
+            }
+        };
+
+        // App state
+        let appState = {
+            currentWeights: { ...INITIAL_WEIGHTS },
+            workoutHistory: [],
+            currentWorkout: null,
+            workoutResults: {},
+            sessionCount: 0,
+            rdlWeeksSinceIncrease: 0,
+            stallState: {}, // Track stall interventions per exercise
+            microResetActive: {}, // Track if exercise is in micro-reset mode
+            deloadCount: {}, // Track how many times exercise done during deload
+            originalFailedWeight: {} // Track weight that failed before deload
+        };
+
+        // Load state from localStorage
+        function loadState() {
+            const saved = localStorage.getItem('workoutTracker');
+            if (saved) {
+                const savedState = JSON.parse(saved);
+                appState = {
+                    ...appState,
+                    ...savedState,
+                    stallState: savedState.stallState || {},
+                    microResetActive: savedState.microResetActive || {},
+                    deloadCount: savedState.deloadCount || {},
+                    originalFailedWeight: savedState.originalFailedWeight || {}
+                };
+            }
+        }
+
+        // Save state to localStorage
+        function saveState() {
+            localStorage.setItem('workoutTracker', JSON.stringify(appState));
+        }
+
+        // Calculate warmup sets for an exercise
+        function calculateWarmupSets(exerciseKey, workingWeight) {
+            const exercise = EXERCISE_INFO[exerciseKey];
+
+            // No warmup needed for pull-ups
+            if (exerciseKey === 'pullups') {
+                return [];
+            }
+
+            // Barbell exercises - round down to nearest 5 lbs, minimum 45 lbs
+            const roundToFive = (weight) => Math.floor(weight / 5) * 5;
+
+            const set1Weight = Math.max(45, roundToFive(workingWeight * 0.45)); // ~45% but min 45lbs
+            const set2Weight = Math.max(45, roundToFive(workingWeight * 0.65)); // ~65% but min 45lbs
+            const set3Weight = Math.max(45, roundToFive(workingWeight * 0.8)); // ~80% but min 45lbs
+
+            return [
+                `${set1Weight}lbs × 5 reps`,
+                `${set2Weight}lbs × 3 reps`,
+                `${set3Weight}lbs × 2 reps`
+            ];
+        }
+
+        // Toggle warmup display
+        function toggleWarmup(exerciseKey) {
+            const warmupContent = document.getElementById(`warmup-${exerciseKey}`);
+            const toggle = document.getElementById(`warmup-toggle-${exerciseKey}`);
+
+            if (warmupContent.classList.contains('hidden')) {
+                warmupContent.classList.remove('hidden');
+                toggle.classList.add('expanded');
+                toggle.setAttribute('aria-expanded', 'true');
+                toggle.setAttribute('aria-label', `Hide warmup instructions for ${exerciseKey}`);
+            } else {
+                warmupContent.classList.add('hidden');
+                toggle.classList.remove('expanded');
+                toggle.setAttribute('aria-expanded', 'false');
+                toggle.setAttribute('aria-label', `Show warmup instructions for ${exerciseKey}`);
+            }
+        }
+
+        // Handle keyboard navigation for warmup toggles
+        function handleWarmupKeydown(event, exerciseKey) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleWarmup(exerciseKey);
+            }
+        }
+
+        // Handle keyboard navigation for exercise buttons
+        function handleExerciseKeydown(event, exerciseKey, result) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                logExercise(exerciseKey, result);
+            }
+        }
+
+        // Get current workout type based on session count
+        function getCurrentWorkoutType() {
+            const cycle = appState.sessionCount % 4;
+            switch (cycle) {
+                case 0: return 'A_HEAVY';
+                case 1: return 'B';
+                case 2: return 'A_LIGHT';
+                case 3: return 'B';
+            }
+        }
+
+        // Calculate next weights based on progression rules
+        function calculateNextWeight(exercise, currentWeight, hit) {
+            if (!hit) return currentWeight; // Same weight if missed
+
+            switch (exercise) {
+                case 'deadlift':
+                case 'squat':
+                    // +10lb when crisp, +5lb when form gets grindy (simplified to always +10 for now)
+                    return currentWeight + 10;
+
+                case 'rdl':
+                    // +10lb every 2-3 weeks (track separately)
+                    appState.rdlWeeksSinceIncrease++;
+                    if (appState.rdlWeeksSinceIncrease >= 2) {
+                        appState.rdlWeeksSinceIncrease = 0;
+                        return currentWeight + 10;
+                    }
+                    return currentWeight;
+
+                case 'bench':
+                case 'ohp':
+                case 'row':
+                    return currentWeight + 5;
+
+                case 'pullups':
+                    return currentWeight + 5;
+
+                default:
+                    return currentWeight;
+            }
+        }
+
+        // Check for stalls and handle automatically
+        function checkAndHandleStalls() {
+            const recentHistory = appState.workoutHistory.slice(-8); // Last 8 workouts
+            const actions = [];
+
+            for (const exercise of Object.keys(appState.currentWeights)) {
+                // Skip pull-ups from stall detection - they just keep trying the same weight
+                if (exercise === 'pullups') continue;
+
+                const exerciseHistory = recentHistory
+                    .filter(workout => workout.results[exercise] !== undefined)
+                    .slice(-2); // Last 2 times this exercise was done
+
+                // Check if we have 2 consecutive misses
+                if (exerciseHistory.length === 2 &&
+                    exerciseHistory.every(w => !w.results[exercise])) {
+
+                    if (!appState.stallState[exercise]) {
+                        // First stall - initiate micro-reset
+                        appState.stallState[exercise] = 'micro-reset';
+                        appState.microResetActive[exercise] = true;
+                        actions.push(`${exercise}: Starting micro-reset (3×6)`);
+                        saveState(); // Save immediately
+                    } else if (appState.stallState[exercise] === 'micro-reset') {
+                        // Micro-reset failed - initiate deload
+                        // Store the original failed weight before deloading
+                        appState.originalFailedWeight[exercise] = appState.currentWeights[exercise];
+                        appState.stallState[exercise] = 'deload';
+                        appState.deloadCount[exercise] = 0; // Start counting deload instances
+                        // Round deload weight down to nearest 5 lbs
+                        const deloadWeight = appState.currentWeights[exercise] * 0.75;
+                        appState.currentWeights[exercise] = Math.floor(deloadWeight / 5) * 5;
+                        // Ensure we really got a proper 5lb increment
+                        if (appState.currentWeights[exercise] % 5 !== 0) {
+                            appState.currentWeights[exercise] = Math.floor(appState.currentWeights[exercise] / 5) * 5;
+                        }
+                        appState.microResetActive[exercise] = false;
+                        actions.push(`${exercise}: Micro-reset failed, deloading to ${appState.currentWeights[exercise]}lbs`);
+                        saveState(); // Save immediately
+                    }
+                }
+
+                // Handle deload completion after 2 workouts containing this exercise
+                if (appState.stallState[exercise] === 'deload') {
+                    // Check if we've completed 2 workouts with this exercise since deload started
+                    if ((appState.deloadCount[exercise] || 0) >= 2) {
+                        // Deload week complete, return to original failed weight minus 5 lbs
+                        const originalWeight = appState.originalFailedWeight[exercise];
+                        const returnWeight = originalWeight - 5; // Start 5 lbs below where we failed
+                        appState.currentWeights[exercise] = returnWeight;
+
+                        delete appState.stallState[exercise];
+                        delete appState.deloadCount[exercise];
+                        delete appState.originalFailedWeight[exercise];
+
+                        actions.push(`${exercise}: Deload complete, returning to ${returnWeight}lbs (5 lbs below failed weight)`);
+                        saveState();
+                    }
+                }
+            }
+
+            return { actions };
+        }
+
+        // Initialize workout display
+        function initWorkout() {
+            const workoutType = getCurrentWorkoutType();
+            const workout = WORKOUTS[workoutType];
+
+            appState.currentWorkout = workout;
+            appState.workoutResults = {};
+
+            document.getElementById('workout-type').textContent = workout.name;
+
+            const exercisesDiv = document.getElementById('exercises');
+            exercisesDiv.innerHTML = '';
+
+            workout.exercises.forEach(exercise => {
+                const weight = appState.currentWeights[exercise.key];
+                const weightDisplay = exercise.key === 'pullups'
+                    ? (weight === 0 ? 'Bodyweight' : `+${weight} lbs`)
+                    : `${weight} lbs`;
+
+                const setsDisplay = appState.microResetActive[exercise.key] ? '3×6' : exercise.sets;
+                const exerciseInfo = EXERCISE_INFO[exercise.key];
+                const warmupSets = calculateWarmupSets(exercise.key, weight);
+
+                const exerciseDiv = document.createElement('section');
+                exerciseDiv.className = 'exercise';
+                exerciseDiv.setAttribute('aria-labelledby', `exercise-name-${exercise.key}`);
+
+                // Build warmup section only if warmup sets exist
+                const warmupSection = warmupSets.length > 0 ? `
+                    <button class="warmup-toggle" id="warmup-toggle-${exercise.key}"
+                            onclick="toggleWarmup('${exercise.key}')"
+                            onkeydown="handleWarmupKeydown(event, '${exercise.key}')"
+                            aria-expanded="false"
+                            aria-controls="warmup-${exercise.key}"
+                            aria-label="Show warmup instructions for ${exercise.name}">
+                        <span>Warmup</span>
+                        <span class="warmup-caret" aria-hidden="true">⌄</span>
+                    </button>
+                    <div class="warmup-content hidden" id="warmup-${exercise.key}" role="region" aria-labelledby="warmup-toggle-${exercise.key}">
+                        <div><strong>Warmup Sets:</strong></div>
+                        <ul class="warmup-sets" role="list">
+                            ${warmupSets.map(set => `<li class="warmup-set">${set}</li>`).join('')}
+                        </ul>
+                    </div>
+                ` : '';
+
+                exerciseDiv.innerHTML = `
+                    <h3 class="exercise-name" id="exercise-name-${exercise.key}">${exercise.name}</h3>
+                    <div class="exercise-target" aria-label="Target: ${weightDisplay} for ${setsDisplay}">${weightDisplay} ${setsDisplay}</div>
+                    <div class="exercise-rest" id="rest-${exercise.key}" aria-label="Rest time: ${exerciseInfo.rest}">Rest: ${exerciseInfo.rest}</div>
+                    ${warmupSection}
+                    <div class="exercise-buttons" role="group" aria-labelledby="exercise-name-${exercise.key}" aria-describedby="rest-${exercise.key}">
+                        <button class="btn btn-success"
+                                onclick="logExercise('${exercise.key}', true)"
+                                onkeydown="handleExerciseKeydown(event, '${exercise.key}', true)"
+                                aria-label="Mark ${exercise.name} as completed successfully">
+                            ✓ Hit Target
+                        </button>
+                        <button class="btn btn-miss"
+                                onclick="logExercise('${exercise.key}', false)"
+                                onkeydown="handleExerciseKeydown(event, '${exercise.key}', false)"
+                                aria-label="Mark ${exercise.name} as missed">
+                            ✗ Missed
+                        </button>
+                    </div>
+                `;
+                exercisesDiv.appendChild(exerciseDiv);
+            });
+
+            // Check for stalls and handle automatically
+            const stallInfo = checkAndHandleStalls();
+            if (stallInfo.actions.length > 0) {
+                showStallAlert(stallInfo.actions);
+            } else {
+                document.getElementById('stall-alert').classList.add('hidden');
+            }
+
+            // Also check current exercise for ongoing micro-reset
+            workout.exercises.forEach(exercise => {
+                if (appState.microResetActive[exercise.key]) {
+                    if (!stallInfo.actions.some(action => action.includes(exercise.key))) {
+                        showStallAlert([`${exercise.key}: Micro-reset active (3×6)`]);
+                    }
+                }
+            });
+        }
+
+        // Show stall alert with automatic actions
+        function showStallAlert(actions) {
+            const alert = document.getElementById('stall-alert');
+            const message = document.getElementById('stall-message');
+
+            message.innerHTML = `<strong>Automatic Stall Handling:</strong><br>${actions.join('<br>')}`;
+            alert.classList.remove('hidden');
+        }
+
+        // Log exercise result
+        function logExercise(exerciseKey, hit) {
+            appState.workoutResults[exerciseKey] = hit;
+
+            // Handle micro-reset completion
+            if (appState.microResetActive[exerciseKey] && hit) {
+                // Micro-reset successful, clear stall state and return to 3×8
+                delete appState.stallState[exerciseKey];
+                appState.microResetActive[exerciseKey] = false;
+            }
+
+            // Disable buttons for this exercise
+            const exerciseDiv = event.target.closest('.exercise');
+            const buttons = exerciseDiv.querySelectorAll('button');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.setAttribute('aria-disabled', 'true');
+            });
+
+            // Change appearance based on result and announce to screen readers
+            const exerciseName = exerciseDiv.querySelector('.exercise-name').textContent;
+            if (hit) {
+                exerciseDiv.style.backgroundColor = '#f0fdf4';
+                exerciseDiv.style.borderColor = '#059669';
+                exerciseDiv.setAttribute('aria-label', `${exerciseName} marked as completed successfully`);
+                announceToScreenReader(`${exerciseName} marked as hit target`);
+            } else {
+                exerciseDiv.style.backgroundColor = '#fef2f2';
+                exerciseDiv.style.borderColor = '#dc2626';
+                exerciseDiv.setAttribute('aria-label', `${exerciseName} marked as missed`);
+                announceToScreenReader(`${exerciseName} marked as missed`);
+            }
+
+            // Check if all exercises are logged
+            const totalExercises = appState.currentWorkout.exercises.length;
+            const loggedExercises = Object.keys(appState.workoutResults).length;
+
+            if (loggedExercises === totalExercises) {
+                showCompleteButton();
+                showNextSession();
+            }
+        }
+
+        // Show complete workout button
+        function showCompleteButton() {
+            document.getElementById('complete-workout').classList.remove('hidden');
+        }
+
+        // Show next session preview
+        function showNextSession() {
+            const nextSessionDiv = document.getElementById('next-session');
+            const contentDiv = document.getElementById('next-session-content');
+
+            // Calculate next workout type
+            const nextWorkoutType = ((appState.sessionCount + 1) % 4);
+            let nextWorkoutName;
+            switch (nextWorkoutType) {
+                case 0: nextWorkoutName = 'Workout A (Heavy Hinge)'; break;
+                case 1: nextWorkoutName = 'Workout B'; break;
+                case 2: nextWorkoutName = 'Workout A (Light Hinge)'; break;
+                case 3: nextWorkoutName = 'Workout B'; break;
+            }
+
+            // Calculate next weights
+            const nextWeights = { ...appState.currentWeights };
+            appState.currentWorkout.exercises.forEach(exercise => {
+                const hit = appState.workoutResults[exercise.key];
+                nextWeights[exercise.key] = calculateNextWeight(exercise.key, appState.currentWeights[exercise.key], hit);
+            });
+
+            contentDiv.innerHTML = `
+                <strong>${nextWorkoutName}</strong><br>
+                <small>Weights will be updated after completing this workout</small>
+            `;
+
+            nextSessionDiv.classList.remove('hidden');
+        }
+
+        // Complete workout
+        function completeWorkout() {
+            // Track deload instances and update weights
+            appState.currentWorkout.exercises.forEach(exercise => {
+                const hit = appState.workoutResults[exercise.key];
+
+                // If exercise is in deload, increment counter
+                if (appState.stallState[exercise.key] === 'deload') {
+                    appState.deloadCount[exercise.key] = (appState.deloadCount[exercise.key] || 0) + 1;
+                }
+
+                // Only update weight if not in deload (deload maintains same weight)
+                if (appState.stallState[exercise.key] !== 'deload') {
+                    appState.currentWeights[exercise.key] = calculateNextWeight(exercise.key, appState.currentWeights[exercise.key], hit);
+                }
+            });
+
+            // Save workout to history
+            const workout = {
+                date: new Date().toISOString(),
+                type: getCurrentWorkoutType(),
+                results: { ...appState.workoutResults }
+            };
+            appState.workoutHistory.push(workout);
+
+            // Increment session count
+            appState.sessionCount++;
+
+            // Save state
+            saveState();
+
+            // Reset for next workout
+            initWorkout();
+            document.getElementById('next-session').classList.add('hidden');
+            document.getElementById('complete-workout').classList.add('hidden');
+        }
+
+        // Show section
+        function showSection(section) {
+            // Update nav buttons and ARIA states
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-pressed', 'false');
+            });
+            event.target.classList.add('active');
+            event.target.setAttribute('aria-pressed', 'true');
+
+            // Show/hide sections
+            document.getElementById('workout-section').classList.toggle('hidden', section !== 'workout');
+            document.getElementById('progress-section').classList.toggle('hidden', section !== 'progress');
+
+            // Announce section change to screen readers
+            const announcement = section === 'workout' ? 'Workout section displayed' : 'Progress section displayed';
+            announceToScreenReader(announcement);
+
+            if (section === 'progress') {
+                updateProgressView();
+            }
+        }
+
+        // Announce messages to screen readers
+        function announceToScreenReader(message) {
+            const announcement = document.createElement('div');
+            announcement.setAttribute('aria-live', 'polite');
+            announcement.setAttribute('aria-atomic', 'true');
+            announcement.style.position = 'absolute';
+            announcement.style.left = '-10000px';
+            announcement.style.width = '1px';
+            announcement.style.height = '1px';
+            announcement.style.overflow = 'hidden';
+            announcement.textContent = message;
+
+            document.body.appendChild(announcement);
+
+            setTimeout(() => {
+                document.body.removeChild(announcement);
+            }, 1000);
+        }
+
+        // Update progress view
+        function updateProgressView() {
+            // Total workouts
+            document.getElementById('total-workouts').textContent = appState.workoutHistory.length;
+
+            // Success rate
+            if (appState.workoutHistory.length > 0) {
+                const totalExercises = appState.workoutHistory.reduce((sum, workout) => {
+                    return sum + Object.keys(workout.results).length;
+                }, 0);
+                const successfulExercises = appState.workoutHistory.reduce((sum, workout) => {
+                    return sum + Object.values(workout.results).filter(Boolean).length;
+                }, 0);
+                const successRate = Math.round((successfulExercises / totalExercises) * 100);
+                document.getElementById('success-rate').textContent = `${successRate}%`;
+            }
+
+            // Recent history
+            const historyDiv = document.getElementById('history-list');
+            historyDiv.innerHTML = '';
+
+            appState.workoutHistory.slice(-10).reverse().forEach(workout => {
+                const date = new Date(workout.date).toLocaleDateString();
+                const workoutName = WORKOUTS[workout.type].name;
+                const successes = Object.values(workout.results).filter(Boolean).length;
+                const total = Object.keys(workout.results).length;
+                const status = successes === total ? '✅' : '⚠️';
+
+                const historyItem = document.createElement('div');
+                historyItem.className = 'progress-item';
+                historyItem.innerHTML = `
+                    <div>
+                        <div class="progress-workout">${workoutName}</div>
+                        <div class="progress-date">${date}</div>
+                    </div>
+                    <div class="progress-status">${status} ${successes}/${total}</div>
+                `;
+                historyDiv.appendChild(historyItem);
+            });
+
+            // Current weights
+            const weightsDiv = document.getElementById('current-weights');
+            weightsDiv.innerHTML = '';
+
+            Object.entries(appState.currentWeights).forEach(([exercise, weight]) => {
+                const displayName = exercise.charAt(0).toUpperCase() + exercise.slice(1);
+                const weightDisplay = exercise === 'pullups'
+                    ? (weight === 0 ? 'Bodyweight' : `+${weight} lbs`)
+                    : `${weight} lbs`;
+
+                const weightItem = document.createElement('div');
+                weightItem.className = 'progress-item';
+                weightItem.innerHTML = `
+                    <div class="progress-workout">${displayName}</div>
+                    <div>${weightDisplay}</div>
+                `;
+                weightsDiv.appendChild(weightItem);
+            });
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadState();
+            initWorkout();
+        });
+
+        // Debug function
+        function showDebugInfo() {
+            const debugDiv = document.getElementById('debug-info');
+            debugDiv.style.display = debugDiv.style.display === 'none' ? 'block' : 'none';
+
+            if (debugDiv.style.display === 'block') {
+                const recentHistory = appState.workoutHistory.slice(-4);
+                debugDiv.innerHTML = `
+                    <strong>Current State:</strong><br>
+                    Session Count: ${appState.sessionCount}<br>
+                    Stall States: ${JSON.stringify(appState.stallState)}<br>
+                    Micro-Reset Active: ${JSON.stringify(appState.microResetActive)}<br>
+                    Deload Count: ${JSON.stringify(appState.deloadCount)}<br>
+                    Original Failed Weights: ${JSON.stringify(appState.originalFailedWeight)}<br><br>
+
+                    <strong>Recent History (last 4):</strong><br>
+                    ${recentHistory.map((w, i) =>
+                        `${i+1}. ${new Date(w.date).toLocaleDateString()} - ${w.type}<br>
+                        Results: ${JSON.stringify(w.results)}`
+                    ).join('<br>')}<br><br>
+
+                    <strong>Squat History:</strong><br>
+                    ${recentHistory
+                        .filter(w => w.results.squat !== undefined)
+                        .map(w => `${new Date(w.date).toLocaleDateString()}: ${w.results.squat ? 'HIT' : 'MISS'}`)
+                        .join('<br>')}
+                `;
+            }
+        }
+
+        // Reset all data to start fresh
+        function resetAllData() {
+            if (confirm('Are you sure you want to reset ALL workout data? This cannot be undone.')) {
+                // Clear localStorage
+                localStorage.removeItem('workoutTracker');
+
+                // Reset app state to initial values
+                appState = {
+                    currentWeights: { ...INITIAL_WEIGHTS },
+                    workoutHistory: [],
+                    currentWorkout: null,
+                    workoutResults: {},
+                    sessionCount: 0,
+                    rdlWeeksSinceIncrease: 0,
+                    stallState: {},
+                    microResetActive: {},
+                    deloadCount: {},
+                    originalFailedWeight: {}
+                };
+
+                // Save clean state
+                saveState();
+
+                // Refresh the display
+                initWorkout();
+                if (document.getElementById('progress-section').style.display !== 'none') {
+                    updateProgressView();
+                }
+
+                alert('All data has been reset! Starting fresh with initial weights.');
+            }
+        }
+
+        // Expose functions to global scope
+        window.showSection = showSection;
+        window.logExercise = logExercise;
+        window.completeWorkout = completeWorkout;
+        window.showDebugInfo = showDebugInfo;
+        window.resetAllData = resetAllData;
+        window.toggleWarmup = toggleWarmup;
+        window.handleWarmupKeydown = handleWarmupKeydown;
+        window.handleExerciseKeydown = handleExerciseKeydown;
+        window.announceToScreenReader = announceToScreenReader;
+    </script>
+</body>
+</html>
