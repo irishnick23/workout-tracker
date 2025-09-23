@@ -70,6 +70,8 @@
             padding: 4px;
             border: 1px solid #e9ecef;
             outline: none;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
         .nav-btn {
@@ -82,10 +84,12 @@
             font-size: 16px;
             font-weight: 500;
             cursor: pointer;
-            transition: color 0.1s linear;
+            transition: color 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             color: #6c757d;
             z-index: 1;
             min-width: 120px;
+            will-change: color;
+            -webkit-font-smoothing: antialiased;
         }
 
         .nav-btn:focus {
@@ -111,13 +115,34 @@
             height: calc(100% - 8px);
             background: #000000;
             border-radius: 42px;
-            transition: transform 0.12s linear;
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
             z-index: 0;
+            will-change: transform;
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
+            contain: layout style paint;
+            -webkit-font-smoothing: antialiased;
         }
 
         .nav-toggle.progress::before {
-            transform: translateX(100%);
+            transform: translate3d(100%, 0, 0) scale(1.0);
+        }
+
+        .nav-toggle::before {
+            transform: translate3d(0, 0, 0) scale(1.0);
+        }
+
+        .nav-toggle:hover::before {
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.18);
+        }
+
+        .nav-toggle:active::before {
+            transform: translate3d(0, 0, 0) scale(0.98);
+        }
+
+        .nav-toggle.progress:active::before {
+            transform: translate3d(100%, 0, 0) scale(0.98);
         }
 
         .workout-card {
