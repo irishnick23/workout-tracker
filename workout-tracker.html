@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Workout Tracker</title>
-    <meta name="theme-color" content="#2563eb">
+    <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,6 +25,9 @@
             letter-spacing: -0.02em;
             font-size: 98%;
             font-weight: 400;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
         }
 
         /* Focus indicators for accessibility */
@@ -84,7 +87,7 @@
             font-size: 16px;
             font-weight: 500;
             cursor: pointer;
-            transition: color 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: color 0.2s ease;
             color: #6c757d;
             z-index: 1;
             min-width: 120px;
@@ -115,7 +118,7 @@
             height: calc(100% - 8px);
             background: #000000;
             border-radius: 42px;
-            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
             z-index: 0;
             will-change: transform;
@@ -126,24 +129,9 @@
         }
 
         .nav-toggle.progress::before {
-            transform: translate3d(100%, 0, 0) scale(1.0);
+            transform: translate3d(100%, 0, 0);
         }
 
-        .nav-toggle::before {
-            transform: translate3d(0, 0, 0) scale(1.0);
-        }
-
-        .nav-toggle:hover::before {
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.18);
-        }
-
-        .nav-toggle:active::before {
-            transform: translate3d(0, 0, 0) scale(0.98);
-        }
-
-        .nav-toggle.progress:active::before {
-            transform: translate3d(100%, 0, 0) scale(0.98);
-        }
 
         .workout-card {
             background: white;
@@ -200,9 +188,10 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: all 0.15s ease, transform 0.15s ease;
             min-height: 54px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            will-change: transform;
         }
 
         .btn:hover {
@@ -211,7 +200,7 @@
         }
 
         .btn:active {
-            transform: translateY(0);
+            transform: scale(0.97);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
@@ -362,9 +351,9 @@
             font-size: 14px;
             font-weight: 400;
             cursor: pointer;
-            margin-bottom: 12px;
+            margin-bottom: 4px;
             padding: 8px 0;
-            transition: all 0.2s ease;
+            transition: all 0.2s ease-out;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -380,9 +369,13 @@
             opacity: 0.7;
         }
 
+        .warmup-toggle:focus {
+            outline: none !important;
+        }
+
         .warmup-caret {
             font-size: 12px;
-            transition: transform 0.2s ease;
+            transition: transform 0.2s ease-out;
             color: #6c757d;
             margin-left: auto;
         }
@@ -392,13 +385,10 @@
         }
 
         .warmup-content {
-            background: #f8f9fa;
-            border-radius: 4px;
-            padding: 12px;
+            padding: 0px 0px 4px 0px;
             margin-bottom: 12px;
             font-size: 14px;
             color: #6c757d;
-            border-left: 3px solid #e9ecef;
         }
 
         .warmup-content.hidden {
@@ -406,7 +396,7 @@
         }
 
         .warmup-sets {
-            margin-top: 8px;
+            margin: 0;
             padding-left: 0;
             list-style: none;
         }
@@ -840,7 +830,6 @@
                         <span class="warmup-caret" aria-hidden="true">⌄</span>
                     </button>
                     <div class="warmup-content hidden" id="warmup-${actualExercise.key}" role="region" aria-labelledby="warmup-toggle-${actualExercise.key}">
-                        <div><strong>Warmup Sets:</strong></div>
                         <ul class="warmup-sets" role="list">
                             ${warmupSets.map(set => `<li class="warmup-set">${set}</li>`).join('')}
                         </ul>
