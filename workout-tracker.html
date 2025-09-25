@@ -1108,7 +1108,9 @@
             weightsDiv.innerHTML = '';
 
             Object.entries(appState.currentWeights).forEach(([exercise, weight]) => {
-                const displayName = exercise.charAt(0).toUpperCase() + exercise.slice(1);
+                const displayName = exercise === 'rdl' ? 'Romanian Deadlift' :
+                                   exercise === 'ohp' ? 'Overhead Press' :
+                                   exercise.charAt(0).toUpperCase() + exercise.slice(1);
                 const weightDisplay = exercise === 'pullups'
                     ? (weight === 0 ? 'Bodyweight' : `+${weight} lbs`)
                     : `${weight} lbs`;
