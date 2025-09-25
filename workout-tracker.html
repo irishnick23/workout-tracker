@@ -551,7 +551,6 @@
             weekNumber: 1,
             weeklyResults: {}, // Track exercise results per week
             consecutiveFailures: {}, // Track consecutive failures per exercise
-            rdlWeeksSinceIncrease: 0,
             isDeloadWeek: false,
             lastSuccessfulWeights: { ...INITIAL_WEIGHTS }
         };
@@ -681,12 +680,28 @@
 
                 if (allFailed) {
                     appState.consecutiveFailures[exercise] = (appState.consecutiveFailures[exercise] || 0) + 1;
+
+                    // Link RDL and deadlift failure tracking
+                    if (exercise === 'deadlift') {
+                        appState.consecutiveFailures['rdl'] = appState.consecutiveFailures[exercise];
+                    } else if (exercise === 'rdl') {
+                        appState.consecutiveFailures['deadlift'] = appState.consecutiveFailures[exercise];
+                    }
+
                     if (appState.consecutiveFailures[exercise] >= 2) {
                         needsDeload = true;
                     }
                 } else if (results.some(result => result)) {
                     // At least one success - reset failure count
                     appState.consecutiveFailures[exercise] = 0;
+
+                    // Link RDL and deadlift failure reset
+                    if (exercise === 'deadlift') {
+                        appState.consecutiveFailures['rdl'] = 0;
+                    } else if (exercise === 'rdl') {
+                        appState.consecutiveFailures['deadlift'] = 0;
+                    }
+
                     appState.lastSuccessfulWeights[exercise] = appState.currentWeights[exercise];
                 }
             }
@@ -714,15 +729,15 @@
                     switch (exercise) {
                         case 'deadlift':
                         case 'squat':
-                            appState.currentWeights[exercise] += 10;
+                            appState.currentWeights[exercise] += 5;
                             break;
 
                         case 'rdl':
-                            // Progress every 2-3 weeks only if successful
-                            appState.rdlWeeksSinceIncrease++;
-                            if (appState.rdlWeeksSinceIncrease >= 2) {
-                                appState.currentWeights[exercise] += 10;
-                                appState.rdlWeeksSinceIncrease = 0;
+                            // RDL follows deadlift progression - check if deadlift progressed this week
+                            const deadliftResults = weekResults['deadlift'] || [];
+                            const deadliftAllSuccessful = deadliftResults.length > 0 && deadliftResults.every(result => result);
+                            if (deadliftAllSuccessful) {
+                                appState.currentWeights[exercise] += 5;
                             }
                             break;
 
@@ -1176,7 +1191,6 @@
                     weekNumber: 1,
                     weeklyResults: {},
                     consecutiveFailures: {},
-                    rdlWeeksSinceIncrease: 0,
                     isDeloadWeek: false,
                     lastSuccessfulWeights: { ...INITIAL_WEIGHTS }
                 };
