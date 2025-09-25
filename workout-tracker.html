@@ -1141,10 +1141,50 @@
             });
         }
 
+        // Touch/swipe handling for mobile navigation
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchEndX = 0;
+        let touchEndY = 0;
+
+        function handleTouchStart(event) {
+            touchStartX = event.touches[0].clientX;
+            touchStartY = event.touches[0].clientY;
+        }
+
+        function handleTouchEnd(event) {
+            touchEndX = event.changedTouches[0].clientX;
+            touchEndY = event.changedTouches[0].clientY;
+            handleSwipe();
+        }
+
+        function handleSwipe() {
+            const deltaX = touchEndX - touchStartX;
+            const deltaY = touchEndY - touchStartY;
+            const minSwipeDistance = 50;
+
+            // Only trigger swipe if horizontal movement is greater than vertical
+            if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
+                const isWorkoutVisible = !document.getElementById('workout-section').classList.contains('hidden');
+
+                if (deltaX > 0 && !isWorkoutVisible) {
+                    // Swipe right - go to workout
+                    document.querySelector('.nav-btn[onclick*="workout"]').click();
+                } else if (deltaX < 0 && isWorkoutVisible) {
+                    // Swipe left - go to progress
+                    document.querySelector('.nav-btn[onclick*="progress"]').click();
+                }
+            }
+        }
+
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
             loadState();
             initWorkout();
+
+            // Add touch event listeners for swipe navigation
+            document.addEventListener('touchstart', handleTouchStart, { passive: true });
+            document.addEventListener('touchend', handleTouchEnd, { passive: true });
         });
 
         // Debug function
