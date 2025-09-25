@@ -264,6 +264,12 @@
             border-bottom: 1px solid #e2e8f0;
         }
 
+        .weight-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .progress-item:last-child {
             border-bottom: none;
         }
@@ -1092,11 +1098,27 @@
                     ? (weight === 0 ? 'Bodyweight' : `+${weight} lbs`)
                     : `${weight} lbs`;
 
+                // Calculate weight difference from starting weight
+                const startingWeight = INITIAL_WEIGHTS[exercise];
+                const difference = weight - startingWeight;
+
+                let progressDisplay = '';
+                if (difference > 0) {
+                    progressDisplay = `<span style="color: #16a34a; font-weight: 500;">+${difference} lbs</span>`;
+                } else if (difference < 0) {
+                    progressDisplay = `<span style="color: #dc2626; font-weight: 500;">${difference} lbs</span>`;
+                } else {
+                    progressDisplay = `<span style="color: #f59e0b; font-weight: 500;">+0 lbs</span>`;
+                }
+
                 const weightItem = document.createElement('div');
                 weightItem.className = 'progress-item';
                 weightItem.innerHTML = `
                     <div class="progress-workout">${displayName}</div>
-                    <div>${weightDisplay}</div>
+                    <div class="weight-display">
+                        <span>${weightDisplay}</span>
+                        ${progressDisplay}
+                    </div>
                 `;
                 weightsDiv.appendChild(weightItem);
             });
