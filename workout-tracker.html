@@ -313,7 +313,7 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 12px;
             margin-bottom: 20px;
         }
@@ -458,6 +458,10 @@
                 <div class="stat-card">
                     <div id="success-rate" class="stat-value">0%</div>
                     <div class="stat-label">Success Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div id="weeks-completed" class="stat-value">0</div>
+                    <div class="stat-label">Weeks Completed</div>
                 </div>
             </div>
 
@@ -1050,6 +1054,10 @@
                 const successRate = Math.round((successfulExercises / totalExercises) * 100);
                 document.getElementById('success-rate').textContent = `${successRate}%`;
             }
+
+            // Weeks completed (every 4 workouts)
+            const weeksCompleted = Math.floor(appState.workoutHistory.length / 4);
+            document.getElementById('weeks-completed').textContent = weeksCompleted;
 
             // Recent history
             const historyDiv = document.getElementById('history-list');
