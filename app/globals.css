@@ -4,9 +4,6 @@
 
 @layer base {
   :root {
-    --font-geist-sans: var(--font-geist-sans);
-    --font-geist-mono: var(--font-geist-mono);
-
     /* Industrial Minimalist Color Palette */
     --color-bg: #FFFFFF;
     --color-bg-secondary: #F9FAFB;

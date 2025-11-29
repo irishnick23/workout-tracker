@@ -73,7 +73,7 @@ export default function WorkoutView() {
 
   return (
     <>
-      <div className="space-y-3 pb-24">
+      <div className="space-y-3">
         {/* Deload Week Banner */}
         {isDeloadWeek && (
           <div className="card border-yellow-200 bg-yellow-50 p-4">

@@ -135,16 +135,6 @@ export default function ProgressView() {
         </div>
       </div>
 
-      {/* Account */}
-      <div className="rounded-lg border border-gray-200 bg-white p-6">
-        <h3 className="mb-4 font-semibold">Account</h3>
-        <button
-          onClick={() => signOut()}
-          className="w-full rounded-md bg-black px-4 py-3 font-medium text-white transition hover:bg-gray-800"
-        >
-          Sign Out
-        </button>
-      </div>
     </div>
   );
 }
