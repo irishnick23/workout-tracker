@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Tracker</title>
+    <meta name="theme-color" content="#ffffff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: #ffffff;
+            color: #000000;
+            line-height: 1.5;
+            letter-spacing: -0.02em;
+            font-size: 98%;
+            font-weight: 400;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Focus indicators for accessibility */
+        *:focus {
+            outline: 2px solid #000000;
+            outline-offset: 2px;
+        }
+
+        button:focus {
+            outline: 2px solid #000000;
+            outline-offset: 2px;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 16px;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+            padding: 20px 0;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #000000;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .nav-toggle {
+            position: relative;
+            background: #f8f9fa;
+            border-radius: 50px;
+            padding: 4px;
+            border: 1px solid #e9ecef;
+            outline: none;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .nav-btn {
+            position: relative;
+            padding: 12px 24px;
+            border: none;
+            outline: none;
+            background: transparent;
+            border-radius: 46px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.2s ease;
+            color: #6c757d;
+            z-index: 1;
+            min-width: 120px;
+            will-change: color;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .nav-btn:focus {
+            outline: none !important;
+            border: none;
+        }
+
+        .nav-btn:hover {
+            color: #000000;
+        }
+
+        .nav-btn.active {
+            color: white;
+            font-weight: 600;
+        }
+
+        .nav-toggle::before {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: calc(50% - 4px);
+            height: calc(100% - 8px);
+            background: #000000;
+            border-radius: 42px;
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            z-index: 0;
+            will-change: transform;
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
+            contain: layout style paint;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .nav-toggle.progress::before {
+            transform: translate3d(100%, 0, 0);
+        }
+
+
+        .workout-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid #e9ecef;
+        }
+
+        .workout-type {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            text-align: center;
+            color: #000000;
+        }
+
+        .exercise {
+            margin-bottom: 20px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+
+        .exercise:last-child {
+            margin-bottom: 0;
+        }
+
+        .exercise-name {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #000000;
+        }
+
+        .exercise-target {
+            font-size: 24px;
+            font-weight: 600;
+            color: #000000;
+            margin-bottom: 12px;
+        }
+
+        .exercise-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px;
+            border: 2px solid transparent;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease, transform 0.15s ease;
+            min-height: 54px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            will-change: transform;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+            color: #16a34a;
+            border: 2px solid #16a34a;
+            font-weight: 500;
+        }
+
+        .btn-success:hover {
+            background: #f0fdf4;
+            color: #15803d;
+            border-color: #15803d;
+            transform: translateY(-1px);
+        }
+
+        .btn-success:active {
+            background: #dcfce7;
+            transform: translateY(0);
+        }
+
+        .btn-miss {
+            background: linear-gradient(135deg, #fef2f2 0%, #fef7f7 100%);
+            color: #dc2626;
+            border: 2px solid #dc2626;
+            font-weight: 500;
+        }
+
+        .btn-miss:hover {
+            background: #fef2f2;
+            color: #b91c1c;
+            border-color: #b91c1c;
+            transform: translateY(-1px);
+        }
+
+        .btn-miss:active {
+            background: #fee2e2;
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: #000000;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #343a40;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .progress-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .weight-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-item:last-child {
+            border-bottom: none;
+        }
+
+        .progress-date {
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .progress-workout {
+            font-weight: 500;
+        }
+
+        .progress-status {
+            font-size: 20px;
+        }
+
+        .next-session {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .next-session h3 {
+            color: #000000;
+            margin-bottom: 8px;
+        }
+
+        .stall-alert {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .stall-alert h3 {
+            color: #000000;
+            margin-bottom: 8px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 16px;
+            border-radius: 6px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #000000;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #6c757d;
+            margin-top: 4px;
+        }
+
+        .exercise-rest {
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 8px;
+        }
+
+        .warmup-toggle {
+            background: none;
+            border: none;
+            color: #6c757d;
+            font-size: 14px;
+            font-weight: 400;
+            cursor: pointer;
+            margin-bottom: 4px;
+            padding: 8px 0;
+            transition: all 0.2s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            text-align: left;
+        }
+
+        .warmup-toggle:hover {
+            color: #000000;
+        }
+
+        .warmup-toggle:active {
+            opacity: 0.7;
+        }
+
+        .warmup-toggle:focus {
+            outline: none !important;
+        }
+
+        .warmup-caret {
+            font-size: 12px;
+            transition: transform 0.2s ease-out;
+            color: #6c757d;
+            margin-left: auto;
+        }
+
+        .warmup-toggle.expanded .warmup-caret {
+            transform: rotate(180deg);
+        }
+
+        .warmup-content {
+            padding: 0px 0px 4px 0px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .warmup-content.hidden {
+            display: none;
+        }
+
+        .warmup-sets {
+            margin: 0;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .warmup-set {
+            margin-bottom: 4px;
+            position: relative;
+            padding-left: 16px;
+        }
+
+        .warmup-set::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💪 Workout Tracker</h1>
+        </div>
+
+        <nav class="nav" role="navigation" aria-label="Main navigation">
+            <div class="nav-toggle" id="nav-toggle">
+                <button class="nav-btn active" onclick="showSection('workout')" aria-pressed="true" aria-controls="workout-section">Workout</button>
+                <button class="nav-btn" onclick="showSection('progress')" aria-pressed="false" aria-controls="progress-section">Progress</button>
+            </div>
+        </nav>
+
+        <main id="workout-section" role="main">
+            <div id="stall-alert" class="stall-alert hidden" role="alert" aria-live="polite">
+                <h3>⚠️ Stall Detected</h3>
+                <p id="stall-message"></p>
+            </div>
+
+            <section class="workout-card" aria-labelledby="workout-type">
+                <h2 id="workout-type" class="workout-type">Workout A</h2>
+                <div id="exercises" role="group" aria-label="Exercise list"></div>
+            </section>
+
+            <div id="next-session" class="next-session hidden">
+                <h3>🎯 Next Session</h3>
+                <div id="next-session-content"></div>
+            </div>
+
+            <button id="complete-workout" class="btn btn-primary hidden" style="width: 100%; margin-top: 16px;" onclick="completeWorkout()" aria-label="Complete current workout and save results">
+                Complete Workout
+            </button>
+        </main>
+
+        <section id="progress-section" class="hidden" role="complementary" aria-label="Progress and statistics">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div id="total-workouts" class="stat-value">0</div>
+                    <div class="stat-label">Total Workouts</div>
+                </div>
+                <div class="stat-card">
+                    <div id="success-rate" class="stat-value">0%</div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div id="weeks-completed" class="stat-value">0</div>
+                    <div class="stat-label">Weeks Completed</div>
+                </div>
+            </div>
+
+            <div class="workout-card">
+                <h3 style="margin-bottom: 16px;">Recent History</h3>
+                <div id="history-list"></div>
+            </div>
+
+            <div class="workout-card">
+                <h3 style="margin-bottom: 16px;">Current Weights</h3>
+                <div id="current-weights"></div>
+            </div>
+
+            <div class="workout-card">
+                <h3 style="margin-bottom: 16px;">Debug Info</h3>
+                <button class="btn btn-primary" onclick="showDebugInfo()" style="width: 100%; margin-bottom: 10px;">Show Debug Info</button>
+                <button class="btn btn-miss" onclick="resetAllData()" style="width: 100%;">Reset All Data</button>
+                <div id="debug-info" style="margin-top: 10px; font-size: 12px; background: #f1f5f9; padding: 10px; border-radius: 4px; display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initial workout data based on your starting weights
+        const INITIAL_WEIGHTS = {
+            deadlift: 175,
+            rdl: 155,
+            squat: 135,
+            bench: 120,
+            ohp: 75,
+            row: 65,
+            pullups: 0 // Start with bodyweight
+        };
+
+        // Exercise rest times and warmup info
+        const EXERCISE_INFO = {
+            deadlift: { rest: '3-4 min', warmupType: 'barbell' },
+            rdl: { rest: '3-4 min', warmupType: 'barbell' },
+            squat: { rest: '3-4 min', warmupType: 'barbell' },
+            bench: { rest: '2-3 min', warmupType: 'barbell' },
+            ohp: { rest: '2-3 min', warmupType: 'barbell' },
+            row: { rest: '2-3 min', warmupType: 'barbell' },
+            pullups: { rest: '2-3 min', warmupType: 'bodyweight' }
+        };
+
+        // Workout definitions
+        const WORKOUTS = {
+            A_HEAVY: {
+                name: 'Workout A (Heavy Hinge)',
+                exercises: [
+                    { name: 'Deadlift', key: 'deadlift', sets: '3×8' },
+                    { name: 'Overhead Press', key: 'ohp', sets: '3×8' },
+                    { name: 'Barbell Row', key: 'row', sets: '3×8' }
+                ]
+            },
+            A_LIGHT: {
+                name: 'Workout A (Light Hinge)',
+                exercises: [
+                    { name: 'Romanian Deadlift', key: 'rdl', sets: '3×8' },
+                    { name: 'Overhead Press', key: 'ohp', sets: '3×8' },
+                    { name: 'Barbell Row', key: 'row', sets: '3×8' }
+                ]
+            },
+            B: {
+                name: 'Workout B',
+                exercises: [
+                    { name: 'Back Squat', key: 'squat', sets: '3×8' },
+                    { name: 'Bench Press', key: 'bench', sets: '3×8' },
+                    { name: 'Pull-Ups', key: 'pullups', sets: '3×8' }
+                ]
+            }
+        };
+
+        // App state
+        let appState = {
+            currentWeights: { ...INITIAL_WEIGHTS },
+            workoutHistory: [],
+            currentWorkout: null,
+            workoutResults: {},
+            sessionCount: 0,
+            weekNumber: 1,
+            weeklyResults: {}, // Track exercise results per week
+            consecutiveFailures: {}, // Track consecutive failures per exercise
+            isDeloadWeek: false,
+            lastSuccessfulWeights: { ...INITIAL_WEIGHTS }
+        };
+
+        // Load state from localStorage
+        function loadState() {
+            const saved = localStorage.getItem('workoutTracker');
+            if (saved) {
+                const savedState = JSON.parse(saved);
+                appState = {
+                    ...appState,
+                    ...savedState,
+                    weeklyResults: savedState.weeklyResults || {},
+                    consecutiveFailures: savedState.consecutiveFailures || {},
+                    lastSuccessfulWeights: savedState.lastSuccessfulWeights || { ...INITIAL_WEIGHTS }
+                };
+            }
+        }
+
+        // Save state to localStorage
+        function saveState() {
+            localStorage.setItem('workoutTracker', JSON.stringify(appState));
+        }
+
+        // Calculate warmup sets for an exercise
+        function calculateWarmupSets(exerciseKey, workingWeight) {
+            const exercise = EXERCISE_INFO[exerciseKey];
+
+            // No warmup needed for pull-ups
+            if (exerciseKey === 'pullups') {
+                return [];
+            }
+
+            // Barbell exercises - round down to nearest 5 lbs, minimum 45 lbs
+            const roundToFive = (weight) => Math.floor(weight / 5) * 5;
+
+            const set1Weight = Math.max(45, roundToFive(workingWeight * 0.45)); // ~45% but min 45lbs
+            const set2Weight = Math.max(45, roundToFive(workingWeight * 0.65)); // ~65% but min 45lbs
+            const set3Weight = Math.max(45, roundToFive(workingWeight * 0.8)); // ~80% but min 45lbs
+
+            return [
+                `${set1Weight}lbs × 5 reps`,
+                `${set2Weight}lbs × 3 reps`,
+                `${set3Weight}lbs × 2 reps`
+            ];
+        }
+
+        // Toggle warmup display
+        function toggleWarmup(exerciseKey) {
+            const warmupContent = document.getElementById(`warmup-${exerciseKey}`);
+            const toggle = document.getElementById(`warmup-toggle-${exerciseKey}`);
+
+            if (warmupContent.classList.contains('hidden')) {
+                warmupContent.classList.remove('hidden');
+                toggle.classList.add('expanded');
+                toggle.setAttribute('aria-expanded', 'true');
+                toggle.setAttribute('aria-label', `Hide warmup instructions for ${exerciseKey}`);
+            } else {
+                warmupContent.classList.add('hidden');
+                toggle.classList.remove('expanded');
+                toggle.setAttribute('aria-expanded', 'false');
+                toggle.setAttribute('aria-label', `Show warmup instructions for ${exerciseKey}`);
+            }
+        }
+
+        // Handle keyboard navigation for warmup toggles
+        function handleWarmupKeydown(event, exerciseKey) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggleWarmup(exerciseKey);
+            }
+        }
+
+        // Handle keyboard navigation for exercise buttons
+        function handleExerciseKeydown(event, exerciseKey, result) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                logExercise(exerciseKey, result);
+            }
+        }
+
+        // Get current workout type based on session count
+        function getCurrentWorkoutType() {
+            const cycle = appState.sessionCount % 4;
+            switch (cycle) {
+                case 0: return 'A_HEAVY';
+                case 1: return 'B';
+                case 2: return 'A_LIGHT';
+                case 3: return 'B';
+            }
+        }
+
+        // Get current week number (resets every 4 workouts)
+        function getCurrentWeek() {
+            return Math.floor(appState.sessionCount / 4) + 1;
+        }
+
+        // Check if we've completed the current week (all 4 workouts done)
+        function isWeekComplete() {
+            return appState.sessionCount % 4 === 0 && appState.sessionCount > 0;
+        }
+
+        // Calculate weekly progression for next week
+        function calculateWeeklyProgression() {
+            const currentWeek = getCurrentWeek();
+
+            // Check if this is a new week
+            if (currentWeek > appState.weekNumber) {
+                processWeeklyResults();
+                appState.weekNumber = currentWeek;
+                appState.weeklyResults = {}; // Reset for new week
+            }
+        }
+
+        // Process results from completed week and set next week's weights
+        function processWeeklyResults() {
+            const weekResults = appState.weeklyResults;
+
+            // Check for deload trigger first
+            let needsDeload = false;
+
+            for (const exercise of Object.keys(appState.currentWeights)) {
+                if (exercise === 'pullups') continue; // Pull-ups handled separately
+
+                const results = weekResults[exercise] || [];
+                const allFailed = results.length > 0 && results.every(result => !result);
+
+                if (allFailed) {
+                    appState.consecutiveFailures[exercise] = (appState.consecutiveFailures[exercise] || 0) + 1;
+
+                    // Link RDL and deadlift failure tracking
+                    if (exercise === 'deadlift') {
+                        appState.consecutiveFailures['rdl'] = appState.consecutiveFailures[exercise];
+                    } else if (exercise === 'rdl') {
+                        appState.consecutiveFailures['deadlift'] = appState.consecutiveFailures[exercise];
+                    }
+
+                    if (appState.consecutiveFailures[exercise] >= 2) {
+                        needsDeload = true;
+                    }
+                } else if (results.some(result => result)) {
+                    // At least one success - reset failure count
+                    appState.consecutiveFailures[exercise] = 0;
+
+                    // Link RDL and deadlift failure reset
+                    if (exercise === 'deadlift') {
+                        appState.consecutiveFailures['rdl'] = 0;
+                    } else if (exercise === 'rdl') {
+                        appState.consecutiveFailures['deadlift'] = 0;
+                    }
+
+                    appState.lastSuccessfulWeights[exercise] = appState.currentWeights[exercise];
+                }
+            }
+
+            if (needsDeload) {
+                initiateDeloadWeek();
+            } else if (appState.isDeloadWeek) {
+                completeDeloadWeek();
+            } else {
+                progressWeights();
+            }
+        }
+
+        // Progress weights for next week
+        function progressWeights() {
+            const weekResults = appState.weeklyResults;
+
+            for (const exercise of Object.keys(appState.currentWeights)) {
+                const results = weekResults[exercise] || [];
+
+                // Only progress if ALL appearances were successful
+                const allSuccessful = results.length > 0 && results.every(result => result);
+
+                if (allSuccessful) {
+                    switch (exercise) {
+                        case 'deadlift':
+                        case 'squat':
+                            appState.currentWeights[exercise] += 5;
+                            break;
+
+                        case 'rdl':
+                            // RDL follows deadlift progression - check if deadlift progressed this week
+                            const deadliftResults = weekResults['deadlift'] || [];
+                            const deadliftAllSuccessful = deadliftResults.length > 0 && deadliftResults.every(result => result);
+                            if (deadliftAllSuccessful) {
+                                appState.currentWeights[exercise] += 5;
+                            }
+                            break;
+
+                        case 'bench':
+                        case 'ohp':
+                        case 'row':
+                            appState.currentWeights[exercise] += 5;
+                            break;
+
+                        case 'pullups':
+                            // Only progress if both sessions hit 3×8 strict
+                            appState.currentWeights[exercise] += 5;
+                            break;
+                    }
+
+                    appState.lastSuccessfulWeights[exercise] = appState.currentWeights[exercise];
+                }
+                // If not all successful, weight stays the same (retry)
+            }
+        }
+
+        // Initiate deload week
+        function initiateDeloadWeek() {
+            appState.isDeloadWeek = true;
+
+            // All lifts drop to 75% rounded down to nearest 5
+            for (const exercise of Object.keys(appState.currentWeights)) {
+                const deloadWeight = appState.currentWeights[exercise] * 0.75;
+                appState.currentWeights[exercise] = Math.floor(deloadWeight / 5) * 5;
+            }
+
+            // Reset consecutive failures
+            appState.consecutiveFailures = {};
+        }
+
+        // Complete deload week and return to progression
+        function completeDeloadWeek() {
+            appState.isDeloadWeek = false;
+
+            // Return to last successful weights (or 5lbs below)
+            for (const exercise of Object.keys(appState.currentWeights)) {
+                appState.currentWeights[exercise] = Math.max(
+                    appState.lastSuccessfulWeights[exercise] - 5,
+                    45 // Minimum weight
+                );
+            }
+        }
+
+        // Check weekly status and provide feedback
+        function checkWeeklyStatus() {
+            const actions = [];
+
+            if (appState.isDeloadWeek) {
+                actions.push('Deload Week: All exercises at 75% weight');
+                // In deload week, replace heavy deadlift with RDL
+                if (getCurrentWorkoutType() === 'A_HEAVY') {
+                    actions.push('Using RDL instead of heavy deadlift this week');
+                }
+            }
+
+            // Check for consecutive failures that might trigger deload next week
+            for (const exercise of Object.keys(appState.consecutiveFailures)) {
+                const failures = appState.consecutiveFailures[exercise];
+                if (failures === 1) {
+                    actions.push(`${exercise}: One failure streak - needs success this week`);
+                }
+            }
+
+            return { actions };
+        }
+
+        // Initialize workout display
+        function initWorkout() {
+            const workoutType = getCurrentWorkoutType();
+            const workout = WORKOUTS[workoutType];
+
+            appState.currentWorkout = workout;
+            appState.workoutResults = {};
+
+            document.getElementById('workout-type').textContent = workout.name;
+
+            const exercisesDiv = document.getElementById('exercises');
+            exercisesDiv.innerHTML = '';
+
+            workout.exercises.forEach(exercise => {
+                // Handle deload week exercise substitution
+                let actualExercise = exercise;
+                if (appState.isDeloadWeek && exercise.key === 'deadlift') {
+                    // Replace heavy deadlift with RDL during deload week
+                    actualExercise = { name: 'Romanian Deadlift', key: 'rdl', sets: '3×8' };
+                }
+
+                const weight = appState.currentWeights[actualExercise.key];
+                const weightDisplay = actualExercise.key === 'pullups'
+                    ? (weight === 0 ? 'Bodyweight' : `+${weight} lbs`)
+                    : `${weight} lbs`;
+
+                const setsDisplay = actualExercise.sets; // Always 3×8, no micro-reset
+                const exerciseInfo = EXERCISE_INFO[actualExercise.key];
+                const warmupSets = calculateWarmupSets(actualExercise.key, weight);
+
+                const exerciseDiv = document.createElement('section');
+                exerciseDiv.className = 'exercise';
+                exerciseDiv.setAttribute('aria-labelledby', `exercise-name-${actualExercise.key}`);
+
+                // Build warmup section only if warmup sets exist
+                const warmupSection = warmupSets.length > 0 ? `
+                    <button class="warmup-toggle" id="warmup-toggle-${actualExercise.key}"
+                            onclick="toggleWarmup('${actualExercise.key}')"
+                            onkeydown="handleWarmupKeydown(event, '${actualExercise.key}')"
+                            aria-expanded="false"
+                            aria-controls="warmup-${actualExercise.key}"
+                            aria-label="Show warmup instructions for ${actualExercise.name}">
+                        <span>Warmup</span>
+                        <span class="warmup-caret" aria-hidden="true">⌄</span>
+                    </button>
+                    <div class="warmup-content hidden" id="warmup-${actualExercise.key}" role="region" aria-labelledby="warmup-toggle-${actualExercise.key}">
+                        <ul class="warmup-sets" role="list">
+                            ${warmupSets.map(set => `<li class="warmup-set">${set}</li>`).join('')}
+                        </ul>
+                    </div>
+                ` : '';
+
+                exerciseDiv.innerHTML = `
+                    <h3 class="exercise-name" id="exercise-name-${actualExercise.key}">${actualExercise.name}</h3>
+                    <div class="exercise-target" aria-label="Target: ${weightDisplay} for ${setsDisplay}">${weightDisplay} ${setsDisplay}</div>
+                    <div class="exercise-rest" id="rest-${actualExercise.key}" aria-label="Rest time: ${exerciseInfo.rest}">Rest: ${exerciseInfo.rest}</div>
+                    ${warmupSection}
+                    <div class="exercise-buttons" role="group" aria-labelledby="exercise-name-${actualExercise.key}" aria-describedby="rest-${actualExercise.key}">
+                        <button class="btn btn-success"
+                                onclick="logExercise('${actualExercise.key}', true)"
+                                onkeydown="handleExerciseKeydown(event, '${actualExercise.key}', true)"
+                                aria-label="Mark ${actualExercise.name} as completed successfully">
+                            ✓ Hit Target
+                        </button>
+                        <button class="btn btn-miss"
+                                onclick="logExercise('${actualExercise.key}', false)"
+                                onkeydown="handleExerciseKeydown(event, '${actualExercise.key}', false)"
+                                aria-label="Mark ${actualExercise.name} as missed">
+                            ✗ Missed
+                        </button>
+                    </div>
+                `;
+                exercisesDiv.appendChild(exerciseDiv);
+            });
+
+            // Check weekly status and progression
+            calculateWeeklyProgression();
+            const statusInfo = checkWeeklyStatus();
+            if (statusInfo.actions.length > 0) {
+                showStallAlert(statusInfo.actions);
+            } else {
+                document.getElementById('stall-alert').classList.add('hidden');
+            }
+        }
+
+        // Show stall alert with automatic actions
+        function showStallAlert(actions) {
+            const alert = document.getElementById('stall-alert');
+            const message = document.getElementById('stall-message');
+
+            message.innerHTML = `<strong>Automatic Stall Handling:</strong><br>${actions.join('<br>')}`;
+            alert.classList.remove('hidden');
+        }
+
+        // Log exercise result
+        function logExercise(exerciseKey, hit) {
+            appState.workoutResults[exerciseKey] = hit;
+
+            // Track result for weekly progression
+            const currentWeek = getCurrentWeek();
+            if (!appState.weeklyResults[exerciseKey]) {
+                appState.weeklyResults[exerciseKey] = [];
+            }
+            appState.weeklyResults[exerciseKey].push(hit);
+
+            // Disable buttons for this exercise
+            const exerciseDiv = event.target.closest('.exercise');
+            const buttons = exerciseDiv.querySelectorAll('button');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.setAttribute('aria-disabled', 'true');
+            });
+
+            // Change appearance based on result and announce to screen readers
+            const exerciseName = exerciseDiv.querySelector('.exercise-name').textContent;
+            if (hit) {
+                exerciseDiv.style.backgroundColor = '#f0fdf4';
+                exerciseDiv.style.borderColor = '#059669';
+                exerciseDiv.setAttribute('aria-label', `${exerciseName} marked as completed successfully`);
+                announceToScreenReader(`${exerciseName} marked as hit target`);
+            } else {
+                exerciseDiv.style.backgroundColor = '#fef2f2';
+                exerciseDiv.style.borderColor = '#dc2626';
+                exerciseDiv.setAttribute('aria-label', `${exerciseName} marked as missed`);
+                announceToScreenReader(`${exerciseName} marked as missed`);
+            }
+
+            // Check if all exercises are logged
+            const totalExercises = appState.currentWorkout.exercises.length;
+            const loggedExercises = Object.keys(appState.workoutResults).length;
+
+            if (loggedExercises === totalExercises) {
+                showCompleteButton();
+                showNextSession();
+            }
+        }
+
+        // Show complete workout button
+        function showCompleteButton() {
+            document.getElementById('complete-workout').classList.remove('hidden');
+        }
+
+        // Show next session preview
+        function showNextSession() {
+            const nextSessionDiv = document.getElementById('next-session');
+            const contentDiv = document.getElementById('next-session-content');
+
+            // Calculate next workout type
+            const nextWorkoutType = ((appState.sessionCount + 1) % 4);
+            let nextWorkoutName;
+            switch (nextWorkoutType) {
+                case 0: nextWorkoutName = 'Workout A (Heavy Hinge)'; break;
+                case 1: nextWorkoutName = 'Workout B'; break;
+                case 2: nextWorkoutName = 'Workout A (Light Hinge)'; break;
+                case 3: nextWorkoutName = 'Workout B'; break;
+            }
+
+            // Calculate next weights
+            const nextWeights = { ...appState.currentWeights };
+            appState.currentWorkout.exercises.forEach(exercise => {
+                const hit = appState.workoutResults[exercise.key];
+                nextWeights[exercise.key] = calculateNextWeight(exercise.key, appState.currentWeights[exercise.key], hit);
+            });
+
+            contentDiv.innerHTML = `
+                <strong>${nextWorkoutName}</strong><br>
+                <small>Weights will be updated after completing this workout</small>
+            `;
+
+            nextSessionDiv.classList.remove('hidden');
+        }
+
+        // Complete workout
+        function completeWorkout() {
+            // Save workout to history
+            const workout = {
+                date: new Date().toISOString(),
+                type: getCurrentWorkoutType(),
+                results: { ...appState.workoutResults },
+                weekNumber: getCurrentWeek()
+            };
+            appState.workoutHistory.push(workout);
+
+            // Increment session count
+            appState.sessionCount++;
+
+            // Check if week is complete and process results
+            if (isWeekComplete()) {
+                calculateWeeklyProgression();
+            }
+
+            // Save state
+            saveState();
+
+            // Reset for next workout
+            initWorkout();
+            document.getElementById('next-session').classList.add('hidden');
+            document.getElementById('complete-workout').classList.add('hidden');
+        }
+
+        // Show section
+        function showSection(section) {
+            // Update nav buttons and ARIA states
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-pressed', 'false');
+            });
+            event.target.classList.add('active');
+            event.target.setAttribute('aria-pressed', 'true');
+
+            // Update toggle position
+            const navToggle = document.getElementById('nav-toggle');
+            if (section === 'progress') {
+                navToggle.classList.add('progress');
+            } else {
+                navToggle.classList.remove('progress');
+            }
+
+            // Show/hide sections
+            document.getElementById('workout-section').classList.toggle('hidden', section !== 'workout');
+            document.getElementById('progress-section').classList.toggle('hidden', section !== 'progress');
+
+            // Announce section change to screen readers
+            const announcement = section === 'workout' ? 'Workout section displayed' : 'Progress section displayed';
+            announceToScreenReader(announcement);
+
+            if (section === 'progress') {
+                updateProgressView();
+            }
+        }
+
+        // Announce messages to screen readers
+        function announceToScreenReader(message) {
+            const announcement = document.createElement('div');
+            announcement.setAttribute('aria-live', 'polite');
+            announcement.setAttribute('aria-atomic', 'true');
+            announcement.style.position = 'absolute';
+            announcement.style.left = '-10000px';
+            announcement.style.width = '1px';
+            announcement.style.height = '1px';
+            announcement.style.overflow = 'hidden';
+            announcement.textContent = message;
+
+            document.body.appendChild(announcement);
+
+            setTimeout(() => {
+                document.body.removeChild(announcement);
+            }, 1000);
+        }
+
+        // Update progress view
+        function updateProgressView() {
+            // Total workouts
+            document.getElementById('total-workouts').textContent = appState.workoutHistory.length;
+
+            // Success rate
+            if (appState.workoutHistory.length > 0) {
+                const totalExercises = appState.workoutHistory.reduce((sum, workout) => {
+                    return sum + Object.keys(workout.results).length;
+                }, 0);
+                const successfulExercises = appState.workoutHistory.reduce((sum, workout) => {
+                    return sum + Object.values(workout.results).filter(Boolean).length;
+                }, 0);
+                const successRate = Math.round((successfulExercises / totalExercises) * 100);
+                document.getElementById('success-rate').textContent = `${successRate}%`;
+            }
+
+            // Weeks completed (every 4 workouts)
+            const weeksCompleted = Math.floor(appState.workoutHistory.length / 4);
+            document.getElementById('weeks-completed').textContent = weeksCompleted;
+
+            // Recent history
+            const historyDiv = document.getElementById('history-list');
+            historyDiv.innerHTML = '';
+
+            appState.workoutHistory.slice(-10).reverse().forEach(workout => {
+                const date = new Date(workout.date).toLocaleDateString();
+                const workoutName = WORKOUTS[workout.type].name;
+                const successes = Object.values(workout.results).filter(Boolean).length;
+                const total = Object.keys(workout.results).length;
+                const status = successes === total ? '✅' : '⚠️';
+
+                const historyItem = document.createElement('div');
+                historyItem.className = 'progress-item';
+                historyItem.innerHTML = `
+                    <div>
+                        <div class="progress-workout">${workoutName}</div>
+                        <div class="progress-date">${date}</div>
+                    </div>
+                    <div class="progress-status">${status} ${successes}/${total}</div>
+                `;
+                historyDiv.appendChild(historyItem);
+            });
+
+            // Current weights
+            const weightsDiv = document.getElementById('current-weights');
+            weightsDiv.innerHTML = '';
+
+            Object.entries(appState.currentWeights).forEach(([exercise, weight]) => {
+                const displayName = exercise === 'rdl' ? 'Romanian Deadlift' :
+                                   exercise === 'ohp' ? 'Overhead Press' :
+                                   exercise.charAt(0).toUpperCase() + exercise.slice(1);
+                const weightDisplay = exercise === 'pullups'
+                    ? (weight === 0 ? 'Bodyweight' : `+${weight} lbs`)
+                    : `${weight} lbs`;
+
+                // Calculate weight difference from starting weight
+                const startingWeight = INITIAL_WEIGHTS[exercise];
+                const difference = weight - startingWeight;
+
+                let progressDisplay = '';
+                if (difference > 0) {
+                    progressDisplay = `<span style="color: #16a34a; font-weight: 500;">+${difference} lbs</span>`;
+                } else if (difference < 0) {
+                    progressDisplay = `<span style="color: #dc2626; font-weight: 500;">${difference} lbs</span>`;
+                } else {
+                    progressDisplay = `<span style="color: #f59e0b; font-weight: 500;">+0 lbs</span>`;
+                }
+
+                const weightItem = document.createElement('div');
+                weightItem.className = 'progress-item';
+                weightItem.innerHTML = `
+                    <div class="progress-workout">${displayName}</div>
+                    <div class="weight-display">
+                        <span>${weightDisplay}</span>
+                        ${progressDisplay}
+                    </div>
+                `;
+                weightsDiv.appendChild(weightItem);
+            });
+        }
+
+        // Touch/swipe handling for mobile navigation
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchEndX = 0;
+        let touchEndY = 0;
+
+        function handleTouchStart(event) {
+            touchStartX = event.touches[0].clientX;
+            touchStartY = event.touches[0].clientY;
+        }
+
+        function handleTouchEnd(event) {
+            touchEndX = event.changedTouches[0].clientX;
+            touchEndY = event.changedTouches[0].clientY;
+            handleSwipe();
+        }
+
+        function handleSwipe() {
+            const deltaX = touchEndX - touchStartX;
+            const deltaY = touchEndY - touchStartY;
+            const minSwipeDistance = 50;
+
+            // Only trigger swipe if horizontal movement is greater than vertical
+            if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
+                const isWorkoutVisible = !document.getElementById('workout-section').classList.contains('hidden');
+
+                if (deltaX > 0 && !isWorkoutVisible) {
+                    // Swipe right - go to workout
+                    document.querySelector('.nav-btn[onclick*="workout"]').click();
+                } else if (deltaX < 0 && isWorkoutVisible) {
+                    // Swipe left - go to progress
+                    document.querySelector('.nav-btn[onclick*="progress"]').click();
+                }
+            }
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadState();
+            initWorkout();
+
+            // Add touch event listeners for swipe navigation
+            document.addEventListener('touchstart', handleTouchStart, { passive: true });
+            document.addEventListener('touchend', handleTouchEnd, { passive: true });
+        });
+
+        // Debug function
+        function showDebugInfo() {
+            const debugDiv = document.getElementById('debug-info');
+            debugDiv.style.display = debugDiv.style.display === 'none' ? 'block' : 'none';
+
+            if (debugDiv.style.display === 'block') {
+                const recentHistory = appState.workoutHistory.slice(-4);
+                debugDiv.innerHTML = `
+                    <strong>Current State:</strong><br>
+                    Session Count: ${appState.sessionCount}<br>
+                    Week Number: ${appState.weekNumber}<br>
+                    Is Deload Week: ${appState.isDeloadWeek}<br>
+                    Weekly Results: ${JSON.stringify(appState.weeklyResults)}<br>
+                    Consecutive Failures: ${JSON.stringify(appState.consecutiveFailures)}<br><br>
+
+                    <strong>Recent History (last 4):</strong><br>
+                    ${recentHistory.map((w, i) =>
+                        `${i+1}. ${new Date(w.date).toLocaleDateString()} - ${w.type}<br>
+                        Results: ${JSON.stringify(w.results)}`
+                    ).join('<br>')}<br><br>
+
+                    <strong>Squat History:</strong><br>
+                    ${recentHistory
+                        .filter(w => w.results.squat !== undefined)
+                        .map(w => `${new Date(w.date).toLocaleDateString()}: ${w.results.squat ? 'HIT' : 'MISS'}`)
+                        .join('<br>')}
+                `;
+            }
+        }
+
+        // Reset all data to start fresh
+        function resetAllData() {
+            if (confirm('Are you sure you want to reset ALL workout data? This cannot be undone.')) {
+                // Clear localStorage
+                localStorage.removeItem('workoutTracker');
+
+                // Reset app state to initial values
+                appState = {
+                    currentWeights: { ...INITIAL_WEIGHTS },
+                    workoutHistory: [],
+                    currentWorkout: null,
+                    workoutResults: {},
+                    sessionCount: 0,
+                    weekNumber: 1,
+                    weeklyResults: {},
+                    consecutiveFailures: {},
+                    isDeloadWeek: false,
+                    lastSuccessfulWeights: { ...INITIAL_WEIGHTS }
+                };
+
+                // Save clean state
+                saveState();
+
+                // Refresh the display
+                initWorkout();
+                if (document.getElementById('progress-section').style.display !== 'none') {
+                    updateProgressView();
+                }
+
+                alert('All data has been reset! Starting fresh with initial weights.');
+            }
+        }
+
+        // Expose functions to global scope
+        window.showSection = showSection;
+        window.logExercise = logExercise;
+        window.completeWorkout = completeWorkout;
+        window.showDebugInfo = showDebugInfo;
+        window.resetAllData = resetAllData;
+        window.toggleWarmup = toggleWarmup;
+        window.handleWarmupKeydown = handleWarmupKeydown;
+        window.handleExerciseKeydown = handleExerciseKeydown;
+        window.announceToScreenReader = announceToScreenReader;
+    </script>
+</body>
+</html>
