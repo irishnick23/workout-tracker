@@ -77,11 +77,6 @@
 }
 
 @layer utilities {
-  /* Mono Font Utility for Numbers */
-  .font-mono {
-    font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
-  }
-
   /* Status Indicator Dots */
   .status-todo {
     @apply h-6 w-6 rounded-full border-2 border-gray-300 bg-white;
