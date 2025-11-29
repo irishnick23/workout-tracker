@@ -229,14 +229,14 @@ export default function WorkoutView() {
                 </label>
                 <div className="flex h-[68px] items-center justify-center rounded-lg border border-input bg-muted/30">
                   <span className="font-mono text-2xl font-bold">
-                    {selectedExercise === 'pullups'
+                    {selectedExercise && selectedExercise === 'pullups'
                       ? currentWeights[selectedExercise] === 0
                         ? 'BW'
                         : `+${currentWeights[selectedExercise]}`
-                      : currentWeights[selectedExercise]}
+                      : selectedExercise ? currentWeights[selectedExercise] : ''}
                   </span>
                   <span className="ml-2 text-sm text-muted-foreground">
-                    {selectedExercise === 'pullups' && currentWeights[selectedExercise] !== 0 ? 'lbs' : selectedExercise !== 'pullups' ? 'lbs' : ''}
+                    {selectedExercise && selectedExercise === 'pullups' && currentWeights[selectedExercise] !== 0 ? 'lbs' : selectedExercise && selectedExercise !== 'pullups' ? 'lbs' : ''}
                   </span>
                 </div>
               </div>
