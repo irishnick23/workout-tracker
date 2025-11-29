@@ -22,8 +22,24 @@ const getInitialState = (): AppState => ({
   workoutResults: {} as Record<ExerciseKey, boolean>,
   sessionCount: 0,
   weekNumber: 1,
-  weeklyResults: {},
-  consecutiveFailures: {},
+  weeklyResults: {
+    deadlift: [],
+    rdl: [],
+    squat: [],
+    bench: [],
+    ohp: [],
+    row: [],
+    pullups: [],
+  },
+  consecutiveFailures: {
+    deadlift: 0,
+    rdl: 0,
+    squat: 0,
+    bench: 0,
+    ohp: 0,
+    row: 0,
+    pullups: 0,
+  },
   isDeloadWeek: false,
   lastSuccessfulWeights: { ...INITIAL_WEIGHTS },
 });
@@ -105,7 +121,15 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
       get().processWeeklyResults();
       set((s) => ({
         weekNumber: s.weekNumber + 1,
-        weeklyResults: {},
+        weeklyResults: {
+          deadlift: [],
+          rdl: [],
+          squat: [],
+          bench: [],
+          ohp: [],
+          row: [],
+          pullups: [],
+        },
       }));
     }
 
@@ -168,7 +192,15 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
       set({
         currentWeights: newWeights,
         isDeloadWeek: true,
-        consecutiveFailures: {},
+        consecutiveFailures: {
+          deadlift: 0,
+          rdl: 0,
+          squat: 0,
+          bench: 0,
+          ohp: 0,
+          row: 0,
+          pullups: 0,
+        },
       });
     } else if (get().isDeloadWeek) {
       // Complete deload - return to last successful - 5

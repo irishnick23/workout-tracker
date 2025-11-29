@@ -43,7 +43,15 @@ export async function loadWorkoutData(userId: string): Promise<Partial<AppState>
       });
     }
 
-    const consecutiveFailures: Record<ExerciseKey, number> = {};
+    const consecutiveFailures: Record<ExerciseKey, number> = {
+      deadlift: 0,
+      rdl: 0,
+      squat: 0,
+      bench: 0,
+      ohp: 0,
+      row: 0,
+      pullups: 0,
+    };
     const lastSuccessfulWeights: Record<ExerciseKey, number> = { ...INITIAL_WEIGHTS };
     if (statsData) {
       statsData.forEach((row) => {
