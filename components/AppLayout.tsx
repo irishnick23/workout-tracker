@@ -107,7 +107,8 @@ export default function AppLayout() {
             <img
               src="/workout-bear-icon-180.png"
               alt="Workout Tracker"
-              className="h-8 w-8"
+              className="h-12 w-12"
+              style={{ mixBlendMode: 'multiply' }}
             />
 
             {activeTab === 'progress' && (
