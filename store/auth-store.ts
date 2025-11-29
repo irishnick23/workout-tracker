@@ -11,6 +11,8 @@ interface AuthState {
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   sendMagicLink: (email: string) => Promise<void>;
+  sendPhoneOtp: (phone: string) => Promise<void>;
+  verifyPhoneOtp: (phone: string, token: string) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -53,5 +55,22 @@ export const useAuthStore = create<AuthState>((set) => ({
       },
     });
     if (error) throw error;
+  },
+
+  sendPhoneOtp: async (phone) => {
+    const { error } = await supabase.auth.signInWithOtp({
+      phone,
+    });
+    if (error) throw error;
+  },
+
+  verifyPhoneOtp: async (phone, token) => {
+    const { data, error } = await supabase.auth.verifyOtp({
+      phone,
+      token,
+      type: 'sms',
+    });
+    if (error) throw error;
+    set({ user: data.user });
   },
 }));
