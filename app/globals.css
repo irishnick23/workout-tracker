@@ -21,7 +21,7 @@
 
   body {
     @apply bg-white text-gray-900;
-    font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', sans-serif;
     font-feature-settings: 'kern' 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -79,7 +79,7 @@
 @layer utilities {
   /* Mono Font Utility for Numbers */
   .font-mono {
-    font-family: var(--font-geist-mono), 'SF Mono', 'Monaco', 'Consolas', monospace;
+    font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
   }
 
   /* Status Indicator Dots */

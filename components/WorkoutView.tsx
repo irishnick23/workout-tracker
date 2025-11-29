@@ -200,12 +200,12 @@ export default function WorkoutView() {
                     value={editedWeight}
                     onChange={(e) => setEditedWeight(e.target.value)}
                     onFocus={(e) => e.target.select()}
-                    className="w-full rounded-lg border-2 border-gray-200 px-4 py-4 text-center font-mono text-2xl text-gray-900 focus:border-black focus:outline-none"
+                    className="h-[68px] w-full rounded-lg border-2 border-gray-200 px-4 text-center text-2xl text-gray-900 focus:border-black focus:outline-none"
                     step="5"
                     min="0"
                     disabled={selectedExerciseResult !== undefined}
                   />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-500">
+                  <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-500">
                     lbs
                   </span>
                 </div>
@@ -216,7 +216,7 @@ export default function WorkoutView() {
                 <label className="mb-2 block text-sm font-medium text-gray-600">
                   Sets
                 </label>
-                <div className="flex h-[60px] items-center justify-center rounded-lg border-2 border-gray-200 bg-gray-50 font-mono text-2xl text-gray-900">
+                <div className="flex h-[68px] items-center justify-center rounded-lg border-2 border-gray-200 bg-gray-50 text-2xl text-gray-900">
                   {selectedExerciseData.sets}
                 </div>
               </div>
