@@ -98,53 +98,51 @@ export default function AppLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-white pb-20">
+    <div className="min-h-screen bg-background pb-32">
       {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-gray-200 bg-white/80 backdrop-blur-lg">
-        <div className="mx-auto max-w-md px-4 py-4">
-          {/* Top Row: Logo and Sign Out */}
-          <div className="flex items-center justify-between mb-3">
-            <img
-              src="/workout-bear-icon-180.svg"
-              alt="Workout Tracker"
-              className="h-12 w-12"
-            />
+      <header className="sticky top-0 z-30 border-b border-border bg-background">
+        <div className="mx-auto max-w-2xl px-5 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <img
+                src="/workout-bear-icon-180.svg"
+                alt="Workout Tracker"
+                className="h-10 w-10"
+              />
+              <h1 className="text-xl font-bold">Workout Tracker</h1>
+            </div>
 
-            {activeTab === 'progress' && (
-              <button
-                onClick={signOut}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-100"
-              >
-                Sign Out
-              </button>
-            )}
+            <button
+              onClick={signOut}
+              className="px-3 py-2 text-sm font-medium transition-smooth"
+              style={{ color: 'hsl(var(--muted-foreground))' }}
+            >
+              Sign Out
+            </button>
           </div>
-
-          {/* Title Row */}
-          <h1 className="text-2xl font-bold">{getPageTitle()}</h1>
         </div>
       </header>
 
       {/* Content */}
-      <main className="mx-auto max-w-md px-4 py-6">
+      <main className="mx-auto max-w-2xl px-5 py-8">
         {activeTab === 'train' ? <WorkoutView /> : <ProgressView />}
       </main>
 
-      {/* Bottom Navigation */}
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-gray-200 bg-white/80 backdrop-blur-lg">
-        <div className="mx-auto flex max-w-md">
+      {/* Glass Bottom Navigation */}
+      <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-sm px-5">
+        <div className="glass-nav rounded-2xl p-2 flex gap-2">
           <button
             onClick={() => setActiveTab('train')}
-            className={`flex flex-1 flex-col items-center gap-1 px-4 py-3 transition ${
+            className={`flex-1 h-11 rounded-xl font-medium text-sm transition-smooth flex items-center justify-center gap-2 ${
               activeTab === 'train'
-                ? 'text-black'
-                : 'text-gray-400 hover:text-gray-600'
+                ? 'bg-primary text-primary-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
             }`}
             aria-label="Train"
             aria-current={activeTab === 'train' ? 'page' : undefined}
           >
             <svg
-              className="h-6 w-6"
+              className="h-4 w-4"
               fill="none"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -154,21 +152,21 @@ export default function AppLayout() {
             >
               <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
             </svg>
-            <span className="text-xs font-medium">Train</span>
+            Train
           </button>
 
           <button
             onClick={() => setActiveTab('progress')}
-            className={`flex flex-1 flex-col items-center gap-1 px-4 py-3 transition ${
+            className={`flex-1 h-11 rounded-xl font-medium text-sm transition-smooth flex items-center justify-center gap-2 ${
               activeTab === 'progress'
-                ? 'text-black'
-                : 'text-gray-400 hover:text-gray-600'
+                ? 'bg-primary text-primary-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
             }`}
             aria-label="Progress"
             aria-current={activeTab === 'progress' ? 'page' : undefined}
           >
             <svg
-              className="h-6 w-6"
+              className="h-4 w-4"
               fill="none"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -178,7 +176,7 @@ export default function AppLayout() {
             >
               <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
-            <span className="text-xs font-medium">Progress</span>
+            Progress
           </button>
         </div>
       </nav>

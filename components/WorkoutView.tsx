@@ -15,6 +15,8 @@ export default function WorkoutView() {
     completeWorkout,
     isDeloadWeek,
     overrideWeight,
+    weekNumber,
+    sessionCount,
   } = useWorkoutStore();
 
   const [selectedExercise, setSelectedExercise] = useState<ExerciseKey | null>(null);
@@ -71,12 +73,32 @@ export default function WorkoutView() {
     ? workoutResults[selectedExercise]
     : undefined;
 
+  const sessionWithinWeek = (sessionCount % 4) + 1;
+
   return (
     <>
-      <div className="space-y-3">
+      <div className="space-y-8">
+        {/* Workout Header */}
+        <div className="space-y-1">
+          <div className="flex items-center gap-3">
+            <h2 className="text-3xl font-bold">
+              {currentWorkout.name.split(' ').slice(0, 2).join(' ')}{' '}
+              <span className="text-muted-foreground">
+                {currentWorkout.name.split(' ').slice(2).join(' ')}
+              </span>
+            </h2>
+            {!allExercisesCompleted && (
+              <span className="badge-success">Active</span>
+            )}
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Week {weekNumber} • Session {sessionWithinWeek}
+          </p>
+        </div>
+
         {/* Deload Week Banner */}
         {isDeloadWeek && (
-          <div className="card border-yellow-200 bg-yellow-50 p-4">
+          <div className="card-clean p-5 border-yellow-200 bg-yellow-50">
             <h3 className="mb-1 font-semibold text-yellow-900">Deload Week</h3>
             <p className="text-sm text-yellow-700">
               Weights reduced to 75%. Focus on form and recovery.
@@ -85,87 +107,103 @@ export default function WorkoutView() {
         )}
 
         {/* Exercise Cards */}
-        <div className="space-y-2">
+        <div className="space-y-3">
           {currentWorkout.exercises.map((exercise) => {
             const weight = currentWeights[exercise.key];
             const result = workoutResults[exercise.key];
+            const exerciseInfo = EXERCISE_INFO[exercise.key];
 
             return (
               <button
                 key={exercise.key}
                 onClick={() => openExerciseSheet(exercise.key)}
                 disabled={result !== undefined}
-                className="card-interactive flex w-full items-center justify-between p-4 text-left disabled:opacity-60 disabled:active:scale-100"
+                className="card-clean card-hover w-full p-5 text-left disabled:opacity-60 disabled:hover:shadow-[var(--shadow-soft)] transition-smooth group"
               >
-                <div className="flex-1">
-                  <h3 className="mb-1 font-semibold text-gray-900">
-                    {exercise.name}
-                  </h3>
-                  <p className="font-mono text-sm text-gray-600">
-                    {exercise.key === 'pullups'
-                      ? weight === 0
-                        ? 'Bodyweight'
-                        : `+${weight} lbs`
-                      : `${weight} lbs`}{' '}
-                    · {exercise.sets}
-                  </p>
-                </div>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 space-y-1">
+                    <h3 className="font-semibold text-base">
+                      {exercise.name}
+                    </h3>
+                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                      <span className="font-mono font-medium text-foreground">
+                        {exercise.key === 'pullups'
+                          ? weight === 0
+                            ? 'Bodyweight'
+                            : `+${weight} lbs`
+                          : `${weight} lbs`}
+                      </span>
+                      <span style={{ color: 'hsl(var(--border))' }}>•</span>
+                      <span className="font-mono">{exercise.sets}</span>
+                      <span style={{ color: 'hsl(var(--border))' }}>•</span>
+                      <span>{exerciseInfo.rest}</span>
+                    </div>
+                  </div>
 
-                {/* Status Indicator */}
-                <div className="ml-4">
-                  {result === undefined && (
-                    <div className="status-todo" aria-label="Not started" />
-                  )}
-                  {result === true && (
-                    <div
-                      className="status-done"
-                      aria-label="Completed successfully"
-                    >
+                  {/* Status Indicator */}
+                  <div className="ml-4 flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      result === undefined
+                        ? 'border-2 border-border'
+                        : result === true
+                        ? 'bg-primary'
+                        : 'bg-destructive'
+                    }`}>
+                      {result === true && (
+                        <svg
+                          className="h-5 w-5"
+                          fill="none"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={3}
+                          viewBox="0 0 24 24"
+                          stroke="white"
+                        >
+                          <path d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                      {result === false && (
+                        <svg
+                          className="h-5 w-5"
+                          fill="none"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={3}
+                          viewBox="0 0 24 24"
+                          stroke="white"
+                        >
+                          <path d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      )}
+                    </div>
+                    {result === undefined && (
                       <svg
-                        className="h-4 w-4 text-white"
+                        className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-smooth"
                         fill="none"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        strokeWidth={3}
+                        strokeWidth={2}
                         viewBox="0 0 24 24"
                         stroke="currentColor"
+                        style={{ color: 'hsl(var(--muted-foreground))' }}
                       >
-                        <path d="M5 13l4 4L19 7" />
+                        <path d="M9 5l7 7-7 7" />
                       </svg>
-                    </div>
-                  )}
-                  {result === false && (
-                    <div className="status-missed" aria-label="Missed">
-                      <svg
-                        className="h-4 w-4 text-white"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={3}
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </button>
             );
           })}
         </div>
-      </div>
 
-      {/* Fixed Finish Workout Button */}
-      {allExercisesCompleted && (
-        <div className="fixed inset-x-0 bottom-0 border-t border-gray-200 bg-white p-4">
-          <div className="mx-auto max-w-md">
-            <button onClick={handleComplete} className="btn-primary">
-              Finish Workout
-            </button>
-          </div>
-        </div>
-      )}
+        {/* Complete Workout Button */}
+        {allExercisesCompleted && (
+          <button onClick={handleComplete} className="btn-primary">
+            Complete Workout
+          </button>
+        )}
+      </div>
 
       {/* Exercise Log Bottom Sheet */}
       <BottomSheet
@@ -177,46 +215,38 @@ export default function WorkoutView() {
           <div className="space-y-6">
             {/* Rest Time Info */}
             <div className="text-center">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 Rest: {selectedExerciseInfo.rest}
               </p>
             </div>
 
-            {/* Weight and Reps Input */}
+            {/* Weight and Sets Display */}
             <div className="grid grid-cols-2 gap-4">
-              {/* Weight Input */}
+              {/* Weight Display */}
               <div>
-                <label
-                  htmlFor="weight-input"
-                  className="mb-2 block text-sm font-medium text-gray-600"
-                >
+                <label className="mb-2 block text-sm font-medium text-muted-foreground">
                   Weight
                 </label>
-                <div className="relative">
-                  <input
-                    id="weight-input"
-                    type="number"
-                    inputMode="numeric"
-                    value={editedWeight}
-                    onChange={(e) => setEditedWeight(e.target.value)}
-                    onFocus={(e) => e.target.select()}
-                    className="h-[68px] w-full rounded-lg border-2 border-gray-200 px-4 text-center text-2xl text-gray-900 focus:border-black focus:outline-none"
-                    step="5"
-                    min="0"
-                    disabled={selectedExerciseResult !== undefined}
-                  />
-                  <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-500">
-                    lbs
+                <div className="flex h-[68px] items-center justify-center rounded-lg border border-input bg-muted/30">
+                  <span className="font-mono text-2xl font-bold">
+                    {selectedExercise === 'pullups'
+                      ? currentWeights[selectedExercise] === 0
+                        ? 'BW'
+                        : `+${currentWeights[selectedExercise]}`
+                      : currentWeights[selectedExercise]}
+                  </span>
+                  <span className="ml-2 text-sm text-muted-foreground">
+                    {selectedExercise === 'pullups' && currentWeights[selectedExercise] !== 0 ? 'lbs' : selectedExercise !== 'pullups' ? 'lbs' : ''}
                   </span>
                 </div>
               </div>
 
-              {/* Sets/Reps Display */}
+              {/* Sets Display */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-600">
+                <label className="mb-2 block text-sm font-medium text-muted-foreground">
                   Sets
                 </label>
-                <div className="flex h-[68px] items-center justify-center rounded-lg border-2 border-gray-200 bg-gray-50 text-2xl text-gray-900">
+                <div className="flex h-[68px] items-center justify-center rounded-lg border border-input bg-muted/30 font-mono text-2xl font-bold">
                   {selectedExerciseData.sets}
                 </div>
               </div>
@@ -225,15 +255,37 @@ export default function WorkoutView() {
             {/* Action Buttons */}
             {selectedExerciseResult === undefined ? (
               <div className="space-y-3">
-                <button onClick={handleHit} className="btn-success">
+                <button onClick={handleHit} className="btn-primary flex items-center justify-center gap-2">
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path d="M5 13l4 4L19 7" />
+                  </svg>
                   Hit Target
                 </button>
-                <button onClick={handleMissed} className="btn-error">
+                <button onClick={handleMissed} className="btn-outline destructive flex items-center justify-center gap-2">
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                   Missed
                 </button>
               </div>
             ) : (
-              <div className="text-center text-sm text-gray-600">
+              <div className="text-center text-sm text-muted-foreground">
                 {selectedExerciseResult
                   ? '✓ Marked as completed'
                   : '✗ Marked as missed'}

@@ -29,77 +29,122 @@ export default function ProgressView() {
   const weeksCompleted = Math.floor(totalWorkouts / 4);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      {/* Page Header */}
+      <div className="space-y-1">
+        <h2 className="text-3xl font-bold">Progress</h2>
+        <p className="text-sm text-muted-foreground">Track your strength journey</p>
+      </div>
+
       {/* Stats Grid */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="rounded-md border border-gray-200 bg-white p-4 text-center">
-          <div className="text-2xl font-semibold">{totalWorkouts}</div>
-          <div className="text-sm text-gray-600">Total Workouts</div>
+        <div className="card-clean p-5 text-center space-y-2">
+          <div className="text-3xl font-bold">{totalWorkouts}</div>
+          <div className="text-xs text-muted-foreground">Total<br/>Workouts</div>
         </div>
-        <div className="rounded-md border border-gray-200 bg-white p-4 text-center">
-          <div className="text-2xl font-semibold">{successRate}%</div>
-          <div className="text-sm text-gray-600">Success Rate</div>
+        <div className="card-clean p-5 text-center space-y-2">
+          <div className="text-3xl font-bold">{successRate}%</div>
+          <div className="text-xs text-muted-foreground">Success<br/>Rate</div>
         </div>
-        <div className="rounded-md border border-gray-200 bg-white p-4 text-center">
-          <div className="text-2xl font-semibold">{weeksCompleted}</div>
-          <div className="text-sm text-gray-600">Weeks Completed</div>
+        <div className="card-clean p-5 text-center space-y-2">
+          <div className="text-3xl font-bold">{weeksCompleted}</div>
+          <div className="text-xs text-muted-foreground">Weeks<br/>Completed</div>
         </div>
       </div>
 
       {/* Recent History */}
-      <div className="rounded-lg border border-gray-200 bg-white p-6">
-        <h3 className="mb-4 font-semibold">Recent History</h3>
-        <div className="space-y-3">
-          {workoutHistory.slice(-10).reverse().map((workout, idx) => {
-            const date = new Date(workout.date).toLocaleDateString();
+      <div className="card-clean p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <svg
+            className="h-5 w-5"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            style={{ color: 'hsl(var(--primary))' }}
+          >
+            <path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          </svg>
+          <h3 className="font-semibold text-xl">Recent History</h3>
+        </div>
 
-            if (workout.type === 'WEIGHT_OVERRIDE') {
-              const exerciseName = EXERCISE_DISPLAY_NAMES[workout.exercise!];
-              const change = (workout.newWeight || 0) - (workout.oldWeight || 0);
-              const changeColor = change > 0 ? 'text-green-600' : 'text-red-600';
+        {workoutHistory.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            No workouts completed yet. Start your first session!
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {workoutHistory.slice(-10).reverse().map((workout, idx) => {
+              const date = new Date(workout.date).toLocaleDateString();
+
+              if (workout.type === 'WEIGHT_OVERRIDE') {
+                const exerciseName = EXERCISE_DISPLAY_NAMES[workout.exercise!];
+                const change = (workout.newWeight || 0) - (workout.oldWeight || 0);
+                const changeColor = change > 0 ? 'text-primary' : 'text-destructive';
+
+                return (
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between border-b border-border pb-3 last:border-0"
+                  >
+                    <div>
+                      <div className="font-medium">Weight Override: {exerciseName}</div>
+                      <div className="text-sm text-muted-foreground">{date}</div>
+                    </div>
+                    <div className={`text-sm ${changeColor}`}>
+                      {workout.oldWeight} → {workout.newWeight} lbs
+                    </div>
+                  </div>
+                );
+              }
+
+              const workoutName = WORKOUTS[workout.type].name;
+              const successes = Object.values(workout.results).filter(Boolean).length;
+              const total = Object.keys(workout.results).length;
 
               return (
                 <div
                   key={idx}
-                  className="flex items-center justify-between border-b border-gray-100 pb-3 last:border-0"
+                  className="flex items-center justify-between border-b border-border pb-3 last:border-0"
                 >
                   <div>
-                    <div className="font-medium">Weight Override: {exerciseName}</div>
-                    <div className="text-sm text-gray-600">{date}</div>
+                    <div className="font-medium">{workoutName}</div>
+                    <div className="text-sm text-muted-foreground">{date}</div>
                   </div>
-                  <div className={`text-sm ${changeColor}`}>
-                    {workout.oldWeight} → {workout.newWeight} lbs
+                  <div className="text-sm font-mono">
+                    {successes === total ? (
+                      <span className="text-primary">{successes}/{total}</span>
+                    ) : (
+                      <span className="text-muted-foreground">{successes}/{total}</span>
+                    )}
                   </div>
                 </div>
               );
-            }
-
-            const workoutName = WORKOUTS[workout.type].name;
-            const successes = Object.values(workout.results).filter(Boolean).length;
-            const total = Object.keys(workout.results).length;
-            const status = successes === total ? '✅' : '⚠️';
-
-            return (
-              <div
-                key={idx}
-                className="flex items-center justify-between border-b border-gray-100 pb-3 last:border-0"
-              >
-                <div>
-                  <div className="font-medium">{workoutName}</div>
-                  <div className="text-sm text-gray-600">{date}</div>
-                </div>
-                <div className="text-lg">
-                  {status} {successes}/{total}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+            })}
+          </div>
+        )}
       </div>
 
       {/* Current Weights */}
-      <div className="rounded-lg border border-gray-200 bg-white p-6">
-        <h3 className="mb-4 font-semibold">Current Weights</h3>
+      <div className="card-clean p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <svg
+            className="h-5 w-5"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            style={{ color: 'hsl(var(--primary))' }}
+          >
+            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+          <h3 className="font-semibold text-xl">Current Weights</h3>
+        </div>
+
         <div className="space-y-3">
           {Object.entries(currentWeights).map(([exercise, weight]) => {
             const key = exercise as ExerciseKey;
@@ -113,19 +158,19 @@ export default function ProgressView() {
 
             const startingWeight = INITIAL_WEIGHTS[key];
             const difference = weight - startingWeight;
-            let progressColor = 'text-orange-500';
-            if (difference > 0) progressColor = 'text-green-600';
-            if (difference < 0) progressColor = 'text-red-600';
+            let progressColor = 'text-muted-foreground';
+            if (difference > 0) progressColor = 'text-primary';
+            if (difference < 0) progressColor = 'text-destructive';
 
             return (
               <div
                 key={exercise}
-                className="flex items-center justify-between border-b border-gray-100 pb-3 last:border-0"
+                className="flex items-center justify-between border-b border-border pb-3 last:border-0"
               >
                 <div className="font-medium">{displayName}</div>
-                <div className="flex items-center gap-2">
-                  <span>{weightDisplay}</span>
-                  <span className={`text-sm font-medium ${progressColor}`}>
+                <div className="flex items-center gap-3">
+                  <span className="font-mono font-bold">{key === 'pullups' ? (weight === 0 ? weight : `+${weight}`) : weight} lbs</span>
+                  <span className={`text-sm font-mono px-2 py-1 rounded ${progressColor} ${difference === 0 ? 'bg-muted/30' : 'bg-primary/10'}`}>
                     {difference > 0 ? `+${difference}` : difference} lbs
                   </span>
                 </div>
@@ -134,7 +179,6 @@ export default function ProgressView() {
           })}
         </div>
       </div>
-
     </div>
   );
 }

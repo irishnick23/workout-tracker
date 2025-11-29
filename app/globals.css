@@ -4,28 +4,58 @@
 
 @layer base {
   :root {
-    /* Industrial Minimalist Color Palette */
-    --color-bg: #FFFFFF;
-    --color-bg-secondary: #F9FAFB;
-    --color-text-primary: #111827;
-    --color-text-secondary: #6B7280;
-    --color-success: #10B981;
-    --color-error: #EF4444;
-    --color-action: #000000;
-    --color-border: #E5E7EB;
+    /* Forest Green Primary */
+    --primary: 155 75% 26%;           /* #11764C */
+    --primary-foreground: 0 0% 100%;
+
+    /* Dark Green Text */
+    --foreground: 159 68% 7%;         /* #062017 */
+
+    /* Backgrounds */
+    --background: 0 0% 100%;          /* White */
+    --card: 0 0% 100%;
+
+    /* Muted/Secondary */
+    --secondary: 240 5% 96%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
+
+    /* Borders */
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 155 75% 26%;
+
+    /* Success - Uses forest green */
+    --success: 155 75% 26%;
+    --success-foreground: 0 0% 100%;
+
+    /* Destructive */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Accent - Same as primary */
+    --accent: 155 75% 26%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Shadows */
+    --shadow-soft: 0 1px 3px 0 hsl(240 5% 10% / 0.08);
+    --shadow-card: 0 2px 8px -2px hsl(240 5% 10% / 0.1);
+    --shadow-elevated: 0 8px 24px -4px hsl(240 5% 10% / 0.12);
+    --shadow-glass: 0 8px 32px 0 hsl(240 10% 10% / 0.1);
+
+    /* Transitions */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   * {
-    @apply border-gray-200;
+    @apply border-border;
   }
 
   body {
-    @apply bg-white text-gray-900;
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    @apply bg-background text-foreground font-sans;
     font-feature-settings: 'kern' 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    letter-spacing: -0.01em;
 
     /* iOS Safe Area Support */
     padding-top: env(safe-area-inset-top);
@@ -43,18 +73,22 @@
 
   /* Typography Scale */
   h1 {
-    @apply text-[32px] font-bold leading-tight;
+    @apply text-2xl font-bold leading-tight;
   }
 
   h2 {
-    @apply text-[20px] font-semibold leading-tight;
+    @apply text-xl font-semibold leading-tight;
+  }
+
+  h3 {
+    @apply text-base font-semibold leading-tight;
   }
 
   /* Accessibility Focus States */
   button:focus-visible,
   a:focus-visible,
   input:focus-visible {
-    @apply outline-none ring-2 ring-black ring-offset-2;
+    @apply outline-none ring-2 ring-ring ring-offset-2;
   }
 
   /* Touch Target Sizing (44x44 minimum) */
@@ -77,52 +111,71 @@
 }
 
 @layer utilities {
-  /* Status Indicator Dots */
-  .status-todo {
-    @apply h-6 w-6 rounded-full border-2 border-gray-300 bg-white;
-  }
-
-  .status-done {
-    @apply h-6 w-6 rounded-full bg-green-500 flex items-center justify-center;
-  }
-
-  .status-missed {
-    @apply h-6 w-6 rounded-full bg-red-500 flex items-center justify-center;
-  }
-
   /* Card Styles */
-  .card {
-    @apply rounded-lg border border-gray-200 bg-white shadow-sm;
+  .card-clean {
+    @apply bg-card border border-border rounded-xl;
+    box-shadow: var(--shadow-soft);
   }
 
-  .card-interactive {
-    @apply card transition-all active:scale-[0.98];
+  .card-hover {
+    transition: var(--transition-smooth);
+  }
+
+  .card-hover:hover {
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Glass Navigation */
+  .glass-nav {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: var(--shadow-glass);
   }
 
   /* Button Styles */
   .btn-primary {
-    @apply w-full rounded-lg bg-black px-4 py-3 font-medium text-white transition hover:bg-gray-800 active:scale-[0.98] disabled:opacity-50;
-    min-height: 48px;
+    @apply w-full h-12 rounded-xl font-semibold text-sm transition-smooth active:scale-[0.98] disabled:opacity-50;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
   }
 
-  .btn-secondary {
-    @apply w-full rounded-lg border-2 border-gray-300 bg-white px-4 py-3 font-medium text-gray-900 transition hover:border-gray-400 active:scale-[0.98] disabled:opacity-50;
-    min-height: 48px;
+  .btn-primary:hover {
+    background: hsl(var(--primary) / 0.9);
   }
 
-  .btn-success {
-    @apply w-full rounded-lg bg-green-500 px-4 py-3 font-medium text-white transition hover:bg-green-600 active:scale-[0.98] disabled:opacity-50;
-    min-height: 48px;
+  .btn-outline {
+    @apply w-full h-12 rounded-xl font-semibold text-sm transition-smooth active:scale-[0.98] disabled:opacity-50;
+    border: 1px solid hsl(var(--border));
+    background: transparent;
+    color: hsl(var(--foreground));
   }
 
-  .btn-error {
-    @apply w-full rounded-lg border-2 border-red-500 bg-white px-4 py-3 font-medium text-red-500 transition hover:bg-red-50 active:scale-[0.98] disabled:opacity-50;
-    min-height: 48px;
+  .btn-outline:hover {
+    background: hsl(var(--muted) / 0.5);
+  }
+
+  .btn-outline.destructive {
+    border-color: hsl(var(--destructive) / 0.3);
+    color: hsl(var(--destructive));
+  }
+
+  .btn-outline.destructive:hover {
+    background: hsl(var(--destructive) / 0.1);
+  }
+
+  /* Badge Styles */
+  .badge-success {
+    @apply text-sm font-medium px-3 py-1 rounded-full border-0;
+    background: hsl(var(--primary) / 0.1);
+    color: hsl(var(--primary));
   }
 
   /* Bottom Sheet Styles */
   .bottom-sheet {
-    @apply fixed inset-x-0 bottom-0 z-50 rounded-t-2xl border-t border-gray-200 bg-white shadow-2xl;
+    @apply fixed inset-x-0 bottom-0 z-50 rounded-t-2xl bg-white;
+    box-shadow: var(--shadow-elevated);
   }
 
   .bottom-sheet-overlay {
@@ -135,7 +188,11 @@
   }
 
   .animate-fadeIn {
-    animation: fadeIn 0.2s ease-out;
+    animation: fadeIn 0.4s ease-out;
+  }
+
+  .transition-smooth {
+    transition: var(--transition-smooth);
   }
 
   @keyframes slideUp {
@@ -150,9 +207,11 @@
   @keyframes fadeIn {
     from {
       opacity: 0;
+      transform: translateY(10px);
     }
     to {
       opacity: 1;
+      transform: translateY(0);
     }
   }
 }
