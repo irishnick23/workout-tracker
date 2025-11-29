@@ -101,17 +101,27 @@ export default function AppLayout() {
     <div className="min-h-screen bg-white pb-20">
       {/* Header */}
       <header className="sticky top-0 z-30 border-b border-gray-200 bg-white/80 backdrop-blur-lg">
-        <div className="mx-auto flex max-w-md items-center justify-between px-4 py-4">
-          <h1 className="text-2xl font-bold">{getPageTitle()}</h1>
+        <div className="mx-auto max-w-md px-4 py-4">
+          {/* Top Row: Logo and Sign Out */}
+          <div className="flex items-center justify-between mb-3">
+            <img
+              src="/workout-bear-icon-180.png"
+              alt="Workout Tracker"
+              className="h-8 w-8"
+            />
 
-          {activeTab === 'progress' && (
-            <button
-              onClick={signOut}
-              className="rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-100"
-            >
-              Sign Out
-            </button>
-          )}
+            {activeTab === 'progress' && (
+              <button
+                onClick={signOut}
+                className="rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-100"
+              >
+                Sign Out
+              </button>
+            )}
+          </div>
+
+          {/* Title Row */}
+          <h1 className="text-2xl font-bold">{getPageTitle()}</h1>
         </div>
       </header>
 
