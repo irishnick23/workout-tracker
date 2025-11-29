@@ -103,9 +103,9 @@ export default function AuthForm() {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-white p-5">
-      <div className="w-full max-w-md rounded-lg border border-gray-200 bg-white p-8 shadow-lg">
-        <h2 className="mb-6 text-center text-2xl font-semibold">
-          💪 Workout Tracker
+      <div className="w-full max-w-md">
+        <h2 className="mb-8 text-center text-3xl font-bold">
+          Workout Tracker
         </h2>
 
         {/* Auth Mode Toggle */}
@@ -143,7 +143,7 @@ export default function AuthForm() {
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-md border-2 border-gray-200 px-4 py-3 text-base focus:border-black focus:outline-none"
+                className="w-full rounded-lg border border-gray-200 px-4 py-3 text-base focus:border-black focus:outline-none"
                 required
               />
             </div>
@@ -154,7 +154,7 @@ export default function AuthForm() {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-md border-2 border-gray-200 px-4 py-3 text-base focus:border-black focus:outline-none"
+                className="w-full rounded-lg border border-gray-200 px-4 py-3 text-base focus:border-black focus:outline-none"
                 required
                 minLength={6}
               />
@@ -206,7 +206,7 @@ export default function AuthForm() {
                 placeholder="Phone Number (e.g., +1234567890)"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full rounded-md border-2 border-gray-200 px-4 py-3 text-base focus:border-black focus:outline-none"
+                className="w-full rounded-lg border border-gray-200 px-4 py-3 text-base focus:border-black focus:outline-none"
                 required
                 disabled={showOtpInput}
               />
