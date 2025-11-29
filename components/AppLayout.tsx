@@ -105,10 +105,9 @@ export default function AppLayout() {
           {/* Top Row: Logo and Sign Out */}
           <div className="flex items-center justify-between mb-3">
             <img
-              src="/workout-bear-icon-180.png"
+              src="/workout-bear-icon-180.svg"
               alt="Workout Tracker"
               className="h-12 w-12"
-              style={{ mixBlendMode: 'multiply' }}
             />
 
             {activeTab === 'progress' && (
