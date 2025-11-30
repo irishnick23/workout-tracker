@@ -37,7 +37,21 @@ export default function AuthForm() {
         await signIn(email, password);
       }
     } catch (err: any) {
-      setError(err.message || 'An error occurred');
+      // Translate technical errors to plain language
+      const message = err.message?.toLowerCase() || '';
+      if (message.includes('invalid login') || message.includes('invalid credentials')) {
+        setError('Email or password is incorrect. Try again.');
+      } else if (message.includes('email not confirmed')) {
+        setError('Check your email to confirm your account first.');
+      } else if (message.includes('user not found')) {
+        setError('No account found with this email.');
+      } else if (message.includes('already registered')) {
+        setError('This email is already in use.');
+      } else if (message.includes('network')) {
+        setError('Connection issue. Check your internet.');
+      } else {
+        setError('Something went wrong. Try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -53,15 +67,27 @@ export default function AuthForm() {
       if (!showOtpInput) {
         // Send OTP
         await sendPhoneOtp(phone);
-        setSuccess('OTP sent to your phone!');
+        setSuccess('Code sent! Check your phone.');
         setShowOtpInput(true);
       } else {
         // Verify OTP
         await verifyPhoneOtp(phone, otp);
-        setSuccess('Successfully logged in!');
+        setSuccess('Logged in!');
       }
     } catch (err: any) {
-      setError(err.message || 'An error occurred');
+      // Translate technical errors to plain language
+      const message = err.message?.toLowerCase() || '';
+      if (message.includes('invalid') || message.includes('token')) {
+        setError('Code is incorrect. Try again.');
+      } else if (message.includes('expired')) {
+        setError('Code expired. Request a new one.');
+      } else if (message.includes('phone') && message.includes('invalid')) {
+        setError('Phone number format is incorrect.');
+      } else if (message.includes('network')) {
+        setError('Connection issue. Check your internet.');
+      } else {
+        setError('Something went wrong. Try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -69,7 +95,7 @@ export default function AuthForm() {
 
   const handleMagicLink = async () => {
     if (!email) {
-      setError('Please enter your email address');
+      setError('Enter your email first.');
       return;
     }
 
@@ -80,7 +106,15 @@ export default function AuthForm() {
       await sendMagicLink(email);
       setSuccess('Check your email for the magic link!');
     } catch (err: any) {
-      setError(err.message || 'An error occurred');
+      // Translate technical errors to plain language
+      const message = err.message?.toLowerCase() || '';
+      if (message.includes('rate limit')) {
+        setError('Too many requests. Wait a minute and try again.');
+      } else if (message.includes('network')) {
+        setError('Connection issue. Check your internet.');
+      } else {
+        setError('Could not send email. Try again.');
+      }
     } finally {
       setLoading(false);
     }
