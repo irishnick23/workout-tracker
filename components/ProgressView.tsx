@@ -52,6 +52,59 @@ export default function ProgressView() {
         </div>
       </div>
 
+      {/* Current Weights */}
+      <div className="card-clean p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <svg
+            className="h-5 w-5"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            style={{ color: 'hsl(var(--primary))' }}
+          >
+            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+          <h3 className="font-semibold text-xl">Current Weights</h3>
+        </div>
+
+        <div className="space-y-3">
+          {Object.entries(currentWeights).map(([exercise, weight]) => {
+            const key = exercise as ExerciseKey;
+            const displayName = EXERCISE_DISPLAY_NAMES[key];
+            const weightDisplay =
+              key === 'pullups'
+                ? weight === 0
+                  ? 'Bodyweight'
+                  : `+${weight} lbs`
+                : `${weight} lbs`;
+
+            const startingWeight = INITIAL_WEIGHTS[key];
+            const difference = weight - startingWeight;
+            let progressColor = 'text-muted-foreground';
+            if (difference > 0) progressColor = 'text-primary';
+            if (difference < 0) progressColor = 'text-destructive';
+
+            return (
+              <div
+                key={exercise}
+                className="flex items-center justify-between border-b border-border pb-3 last:border-0"
+              >
+                <div className="font-medium">{displayName}</div>
+                <div className="flex items-center gap-3">
+                  <span className="font-bold">{key === 'pullups' ? (weight === 0 ? weight : `+${weight}`) : weight} lbs</span>
+                  <span className={`text-sm px-2 py-1 rounded ${progressColor} ${difference === 0 ? 'bg-muted/30' : 'bg-primary/10'}`}>
+                    {difference > 0 ? `+${difference}` : difference} lbs
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Recent History */}
       <div className="card-clean p-6 space-y-4">
         <div className="flex items-center gap-2">
@@ -125,59 +178,6 @@ export default function ProgressView() {
             })}
           </div>
         )}
-      </div>
-
-      {/* Current Weights */}
-      <div className="card-clean p-6 space-y-4">
-        <div className="flex items-center gap-2">
-          <svg
-            className="h-5 w-5"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            style={{ color: 'hsl(var(--primary))' }}
-          >
-            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-          </svg>
-          <h3 className="font-semibold text-xl">Current Weights</h3>
-        </div>
-
-        <div className="space-y-3">
-          {Object.entries(currentWeights).map(([exercise, weight]) => {
-            const key = exercise as ExerciseKey;
-            const displayName = EXERCISE_DISPLAY_NAMES[key];
-            const weightDisplay =
-              key === 'pullups'
-                ? weight === 0
-                  ? 'Bodyweight'
-                  : `+${weight} lbs`
-                : `${weight} lbs`;
-
-            const startingWeight = INITIAL_WEIGHTS[key];
-            const difference = weight - startingWeight;
-            let progressColor = 'text-muted-foreground';
-            if (difference > 0) progressColor = 'text-primary';
-            if (difference < 0) progressColor = 'text-destructive';
-
-            return (
-              <div
-                key={exercise}
-                className="flex items-center justify-between border-b border-border pb-3 last:border-0"
-              >
-                <div className="font-medium">{displayName}</div>
-                <div className="flex items-center gap-3">
-                  <span className="font-bold">{key === 'pullups' ? (weight === 0 ? weight : `+${weight}`) : weight} lbs</span>
-                  <span className={`text-sm px-2 py-1 rounded ${progressColor} ${difference === 0 ? 'bg-muted/30' : 'bg-primary/10'}`}>
-                    {difference > 0 ? `+${difference}` : difference} lbs
-                  </span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
       </div>
     </div>
   );
