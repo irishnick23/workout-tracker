@@ -128,7 +128,7 @@ export default function AppLayout() {
       setTimeout(() => {
         setActiveTab('progress');
         setIsTransitioning(false);
-      }, 300);
+      }, 150);
     } else if (isRightSwipe && activeTab === 'progress') {
       // Swipe right: Progress → Train
       haptics.light();
@@ -136,7 +136,7 @@ export default function AppLayout() {
       setTimeout(() => {
         setActiveTab('train');
         setIsTransitioning(false);
-      }, 300);
+      }, 150);
     }
   };
 
@@ -175,7 +175,7 @@ export default function AppLayout() {
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
-        <div className={`transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
+        <div className={`transition-opacity duration-150 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
           {activeTab === 'train' ? <WorkoutView /> : <ProgressView />}
         </div>
       </main>
