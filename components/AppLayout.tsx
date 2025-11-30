@@ -142,8 +142,8 @@ export default function AppLayout() {
 
   return (
     <div className="min-h-screen bg-background pb-32">
-      {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-border bg-background">
+      {/* Fixed Header */}
+      <header className="fixed top-0 left-0 right-0 z-40 border-b border-border bg-background" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="mx-auto max-w-2xl px-5 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -170,6 +170,7 @@ export default function AppLayout() {
       <main
         ref={contentRef}
         className="mx-auto max-w-2xl px-5 py-8"
+        style={{ paddingTop: 'calc(env(safe-area-inset-top) + 76px)' }}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
