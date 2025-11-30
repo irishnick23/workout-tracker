@@ -126,13 +126,87 @@
     box-shadow: var(--shadow-card);
   }
 
-  /* Glass Navigation */
+  /* Liquid Glass Navigation */
   .glass-nav {
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    box-shadow: var(--shadow-glass);
+    /* Multi-layer glass effect */
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 255, 255, 0.85) 100%
+    );
+
+    /* Enhanced blur and vibrancy */
+    backdrop-filter: blur(40px) saturate(180%) brightness(1.05);
+    -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.05);
+
+    /* Subtle border with gradient for depth */
+    border: 1px solid;
+    border-image: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.5),
+      rgba(255, 255, 255, 0.1)
+    ) 1;
+
+    /* Layered shadows for depth */
+    box-shadow:
+      0 8px 32px 0 rgba(31, 38, 135, 0.08),
+      0 2px 8px 0 rgba(31, 38, 135, 0.04),
+      inset 0 1px 1px 0 rgba(255, 255, 255, 0.5),
+      inset 0 -1px 1px 0 rgba(0, 0, 0, 0.02);
+
+    /* Smooth transitions for dynamic effects */
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Subtle reflection effect */
+    position: relative;
+  }
+
+  /* Liquid glass specular highlight overlay */
+  .glass-nav::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.4) 0%,
+      rgba(255, 255, 255, 0) 50%,
+      rgba(255, 255, 255, 0.1) 100%
+    );
+    pointer-events: none;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+  }
+
+  /* Enhanced specular on interaction */
+  .glass-nav:hover::before {
+    opacity: 0.8;
+  }
+
+  /* Subtle refraction effect on child buttons */
+  .glass-nav > button {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .glass-nav > button::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent
+    );
+    transition: left 0.5s ease;
+  }
+
+  .glass-nav > button:hover::after {
+    left: 100%;
   }
 
   /* Button Styles */
