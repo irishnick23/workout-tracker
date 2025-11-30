@@ -113,7 +113,7 @@ export default function ProgressView() {
                     <div className="font-medium">{workoutName}</div>
                     <div className="text-sm text-muted-foreground">{date}</div>
                   </div>
-                  <div className="text-sm font-mono">
+                  <div className="text-sm">
                     {successes === total ? (
                       <span className="text-primary">{successes}/{total}</span>
                     ) : (
@@ -169,8 +169,8 @@ export default function ProgressView() {
               >
                 <div className="font-medium">{displayName}</div>
                 <div className="flex items-center gap-3">
-                  <span className="font-mono font-bold">{key === 'pullups' ? (weight === 0 ? weight : `+${weight}`) : weight} lbs</span>
-                  <span className={`text-sm font-mono px-2 py-1 rounded ${progressColor} ${difference === 0 ? 'bg-muted/30' : 'bg-primary/10'}`}>
+                  <span className="font-bold">{key === 'pullups' ? (weight === 0 ? weight : `+${weight}`) : weight} lbs</span>
+                  <span className={`text-sm px-2 py-1 rounded ${progressColor} ${difference === 0 ? 'bg-muted/30' : 'bg-primary/10'}`}>
                     {difference > 0 ? `+${difference}` : difference} lbs
                   </span>
                 </div>

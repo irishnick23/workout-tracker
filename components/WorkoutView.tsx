@@ -126,7 +126,7 @@ export default function WorkoutView() {
                       {exercise.name}
                     </h3>
                     <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                      <span className="font-mono font-medium text-foreground">
+                      <span className="font-medium text-foreground">
                         {exercise.key === 'pullups'
                           ? weight === 0
                             ? 'Bodyweight'
@@ -134,7 +134,7 @@ export default function WorkoutView() {
                           : `${weight} lbs`}
                       </span>
                       <span style={{ color: 'hsl(var(--border))' }}>•</span>
-                      <span className="font-mono">{exercise.sets}</span>
+                      <span>{exercise.sets}</span>
                       <span style={{ color: 'hsl(var(--border))' }}>•</span>
                       <span>{exerciseInfo.rest}</span>
                     </div>
@@ -232,7 +232,7 @@ export default function WorkoutView() {
                     type="number"
                     value={editedWeight}
                     onChange={(e) => setEditedWeight(e.target.value)}
-                    className="h-[68px] w-full rounded-lg border border-input bg-muted/30 px-4 text-center font-mono text-2xl font-bold focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    className="h-[68px] w-full rounded-lg border border-input bg-muted/30 px-4 text-center text-2xl font-bold focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                     placeholder="0"
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none">
@@ -246,7 +246,7 @@ export default function WorkoutView() {
                 <label className="mb-2 block text-sm font-medium text-muted-foreground">
                   Sets
                 </label>
-                <div className="flex h-[68px] items-center justify-center rounded-lg border border-input bg-muted/30 font-mono text-2xl font-bold">
+                <div className="flex h-[68px] items-center justify-center rounded-lg border border-input bg-muted/30 text-2xl font-bold">
                   {selectedExerciseData.sets}
                 </div>
               </div>
