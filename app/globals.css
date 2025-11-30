@@ -188,24 +188,65 @@
 
   /* Button Styles */
   .btn-primary {
-    @apply w-full h-12 rounded-xl font-semibold text-sm transition-smooth active:scale-[0.98] disabled:opacity-50;
+    @apply w-full h-12 rounded-xl font-semibold text-sm transition-smooth;
     background: hsl(var(--primary));
     color: hsl(var(--primary-foreground));
   }
 
-  .btn-primary:hover {
+  /* Hover state - only when not disabled */
+  .btn-primary:hover:not(:disabled) {
     background: hsl(var(--primary) / 0.9);
   }
 
+  /* Active (pressed) state - only when not disabled */
+  .btn-primary:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  /* Disabled state */
+  .btn-primary:disabled {
+    background: hsl(var(--muted));
+    color: hsl(var(--muted-foreground));
+    cursor: not-allowed;
+  }
+
+  /* Loading state (when button has .loading class) */
+  .btn-primary.loading {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    cursor: wait;
+    pointer-events: none;
+  }
+
   .btn-outline {
-    @apply w-full h-12 rounded-xl font-semibold text-sm transition-smooth active:scale-[0.98] disabled:opacity-50;
+    @apply w-full h-12 rounded-xl font-semibold text-sm transition-smooth;
     border: 1px solid hsl(var(--border));
     background: transparent;
     color: hsl(var(--foreground));
   }
 
-  .btn-outline:hover {
+  /* Hover state - only when not disabled */
+  .btn-outline:hover:not(:disabled) {
     background: hsl(var(--muted) / 0.5);
+  }
+
+  /* Active (pressed) state - only when not disabled */
+  .btn-outline:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  /* Disabled state */
+  .btn-outline:disabled {
+    border-color: hsl(var(--border));
+    color: hsl(var(--muted-foreground));
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  /* Loading state */
+  .btn-outline.loading {
+    cursor: wait;
+    pointer-events: none;
   }
 
   .btn-outline.destructive {
@@ -213,8 +254,14 @@
     color: hsl(var(--destructive));
   }
 
-  .btn-outline.destructive:hover {
+  .btn-outline.destructive:hover:not(:disabled) {
     background: hsl(var(--destructive) / 0.1);
+  }
+
+  .btn-outline.destructive:disabled {
+    border-color: hsl(var(--border));
+    color: hsl(var(--muted-foreground));
+    opacity: 0.5;
   }
 
   /* Badge Styles */

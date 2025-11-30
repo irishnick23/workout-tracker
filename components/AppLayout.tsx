@@ -185,7 +185,7 @@ export default function AppLayout() {
         <div className="glass-nav rounded-2xl p-2 flex gap-2">
           <button
             onClick={() => setActiveTab('train')}
-            className={`flex-1 h-11 rounded-xl font-medium text-sm transition-smooth flex items-center justify-center gap-2 ${
+            className={`flex-1 h-11 rounded-xl font-medium text-sm transition-smooth flex items-center justify-center gap-2 active:scale-[0.98] ${
               activeTab === 'train'
                 ? 'bg-primary text-primary-foreground shadow-sm'
                 : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
@@ -209,7 +209,7 @@ export default function AppLayout() {
 
           <button
             onClick={() => setActiveTab('progress')}
-            className={`flex-1 h-11 rounded-xl font-medium text-sm transition-smooth flex items-center justify-center gap-2 ${
+            className={`flex-1 h-11 rounded-xl font-medium text-sm transition-smooth flex items-center justify-center gap-2 active:scale-[0.98] ${
               activeTab === 'progress'
                 ? 'bg-primary text-primary-foreground shadow-sm'
                 : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
