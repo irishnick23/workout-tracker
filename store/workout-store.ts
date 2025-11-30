@@ -10,7 +10,7 @@ interface WorkoutStore extends AppState {
   getCurrentWeek: () => number;
   processWeeklyResults: () => void;
   calculateWarmupSets: (exercise: ExerciseKey, weight: number) => string[];
-  overrideWeight: (exercise: ExerciseKey, newWeight: number) => Promise<void>;
+  overrideWeight: (exercise: ExerciseKey, newWeight: number, duringWorkout?: boolean) => Promise<void>;
   loadState: (state: Partial<AppState>) => void;
   reset: () => void;
 }
@@ -258,43 +258,55 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
     ];
   },
 
-  overrideWeight: async (exercise, newWeight) => {
+  overrideWeight: async (exercise, newWeight, duringWorkout = false) => {
     const roundedWeight = exercise === 'pullups' && newWeight === 0
       ? 0
       : Math.round(newWeight / 5) * 5;
 
     const oldWeight = get().currentWeights[exercise];
 
-    set((state) => ({
-      currentWeights: {
-        ...state.currentWeights,
-        [exercise]: roundedWeight,
-      },
-      consecutiveFailures: {
-        ...state.consecutiveFailures,
-        [exercise]: 0,
-      },
-      lastSuccessfulWeights: {
-        ...state.lastSuccessfulWeights,
-        [exercise]: roundedWeight,
-      },
-      weeklyResults: {
-        ...state.weeklyResults,
-        [exercise]: [],
-      },
-      workoutHistory: [
-        ...state.workoutHistory,
-        {
-          date: new Date().toISOString(),
-          type: 'WEIGHT_OVERRIDE',
-          exercise,
-          oldWeight,
-          newWeight: roundedWeight,
-          results: {} as Record<ExerciseKey, boolean>,
-          weekNumber: state.getCurrentWeek(),
+    if (duringWorkout) {
+      // Mid-workout weight adjustment - only update current weight
+      // Don't reset weekly results or add WEIGHT_OVERRIDE history entry
+      set((state) => ({
+        currentWeights: {
+          ...state.currentWeights,
+          [exercise]: roundedWeight,
         },
-      ],
-    }));
+      }));
+    } else {
+      // Full weight override from Progress view - reset everything
+      set((state) => ({
+        currentWeights: {
+          ...state.currentWeights,
+          [exercise]: roundedWeight,
+        },
+        consecutiveFailures: {
+          ...state.consecutiveFailures,
+          [exercise]: 0,
+        },
+        lastSuccessfulWeights: {
+          ...state.lastSuccessfulWeights,
+          [exercise]: roundedWeight,
+        },
+        weeklyResults: {
+          ...state.weeklyResults,
+          [exercise]: [],
+        },
+        workoutHistory: [
+          ...state.workoutHistory,
+          {
+            date: new Date().toISOString(),
+            type: 'WEIGHT_OVERRIDE',
+            exercise,
+            oldWeight,
+            newWeight: roundedWeight,
+            results: {} as Record<ExerciseKey, boolean>,
+            weekNumber: state.getCurrentWeek(),
+          },
+        ],
+      }));
+    }
   },
 
   loadState: (state) => {

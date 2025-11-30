@@ -41,10 +41,10 @@ export default function WorkoutView() {
   const handleHit = async () => {
     if (!selectedExercise) return;
 
-    // If weight was edited, save the override first
+    // If weight was edited, update it (mid-workout adjustment)
     const newWeight = parseInt(editedWeight);
     if (!isNaN(newWeight) && newWeight !== currentWeights[selectedExercise]) {
-      await overrideWeight(selectedExercise, newWeight);
+      await overrideWeight(selectedExercise, newWeight, true);
     }
 
     recordResult(selectedExercise, true);
