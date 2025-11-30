@@ -29,8 +29,8 @@
     --success: 155 75% 26%;
     --success-foreground: 0 0% 100%;
 
-    /* Destructive */
-    --destructive: 0 72% 51%;
+    /* Destructive - Deep red balanced with forest green */
+    --destructive: 0 75% 40%;            /* #CC0000 */
     --destructive-foreground: 0 0% 100%;
 
     /* Accent - Same as primary */
