@@ -163,7 +163,7 @@ export default function AuthForm() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-md bg-black px-4 py-3 font-medium text-white transition hover:bg-gray-800 disabled:opacity-50"
+              className="btn-primary"
             >
               {loading ? 'Loading...' : isSignUp ? 'Sign Up' : 'Sign In'}
             </button>
@@ -233,7 +233,7 @@ export default function AuthForm() {
             <button
               type="submit"
               disabled={loading || (showOtpInput && otp.length !== 6)}
-              className="w-full rounded-md bg-black px-4 py-3 font-medium text-white transition hover:bg-gray-800 disabled:opacity-50"
+              className="btn-primary"
             >
               {loading
                 ? 'Loading...'

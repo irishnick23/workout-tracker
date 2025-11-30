@@ -54,6 +54,7 @@
   body {
     @apply bg-background text-foreground font-sans;
     font-feature-settings: 'kern' 1;
+    font-variant-numeric: proportional-nums;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 
@@ -174,12 +175,12 @@
 
   /* Bottom Sheet Styles */
   .bottom-sheet {
-    @apply fixed inset-x-0 bottom-0 z-50 rounded-t-2xl bg-white;
+    @apply fixed inset-x-0 bottom-0 z-[60] rounded-t-2xl bg-white;
     box-shadow: var(--shadow-elevated);
   }
 
   .bottom-sheet-overlay {
-    @apply fixed inset-0 z-40 bg-black/50;
+    @apply fixed inset-0 z-[55] bg-black/50;
   }
 
   /* Animations */

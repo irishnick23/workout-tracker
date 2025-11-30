@@ -222,21 +222,21 @@ export default function WorkoutView() {
 
             {/* Weight and Sets Display */}
             <div className="grid grid-cols-2 gap-4">
-              {/* Weight Display */}
+              {/* Weight Input */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-muted-foreground">
                   Weight
                 </label>
-                <div className="flex h-[68px] items-center justify-center rounded-lg border border-input bg-muted/30">
-                  <span className="font-mono text-2xl font-bold">
-                    {selectedExercise && selectedExercise === 'pullups'
-                      ? currentWeights[selectedExercise] === 0
-                        ? 'BW'
-                        : `+${currentWeights[selectedExercise]}`
-                      : selectedExercise ? currentWeights[selectedExercise] : ''}
-                  </span>
-                  <span className="ml-2 text-sm text-muted-foreground">
-                    {selectedExercise && selectedExercise === 'pullups' && currentWeights[selectedExercise] !== 0 ? 'lbs' : selectedExercise && selectedExercise !== 'pullups' ? 'lbs' : ''}
+                <div className="relative">
+                  <input
+                    type="number"
+                    value={editedWeight}
+                    onChange={(e) => setEditedWeight(e.target.value)}
+                    className="h-[68px] w-full rounded-lg border border-input bg-muted/30 px-4 text-center font-mono text-2xl font-bold focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    placeholder="0"
+                  />
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none">
+                    lbs
                   </span>
                 </div>
               </div>
