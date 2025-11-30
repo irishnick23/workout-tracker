@@ -195,20 +195,6 @@ export default function WorkoutView() {
                         </svg>
                       )}
                     </div>
-                    {result === undefined && (
-                      <svg
-                        className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-smooth"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        style={{ color: 'hsl(var(--muted-foreground))' }}
-                      >
-                        <path d="M9 5l7 7-7 7" />
-                      </svg>
-                    )}
                   </div>
                 </div>
               </button>
