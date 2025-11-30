@@ -227,10 +227,12 @@ export default function WorkoutView() {
                 <div className="relative">
                   <input
                     type="number"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     value={editedWeight}
                     onChange={(e) => setEditedWeight(e.target.value)}
-                    className="h-20 w-full rounded-lg border border-input bg-muted/30 px-4 text-center text-3xl font-bold focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    placeholder="0"
+                    className="h-20 w-full rounded-lg border border-input bg-muted/30 px-4 text-center text-4xl font-bold focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    placeholder=""
                   />
                   <span className="absolute right-3 bottom-2 text-xs text-muted-foreground pointer-events-none">
                     lbs
@@ -243,7 +245,7 @@ export default function WorkoutView() {
                 <label className="mb-2 block text-xs text-muted-foreground uppercase tracking-wide">
                   Sets • {selectedExerciseInfo.rest}
                 </label>
-                <div className="flex h-20 items-center justify-center rounded-lg border border-input bg-muted/30 text-3xl font-bold">
+                <div className="flex h-20 items-center justify-center rounded-lg border border-input bg-muted/30 text-4xl font-bold">
                   {selectedExerciseData.sets}
                 </div>
               </div>
