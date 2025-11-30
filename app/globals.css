@@ -156,7 +156,7 @@
       inset 0 -1px 1px 0 rgba(0, 0, 0, 0.02);
 
     /* Smooth transitions for dynamic effects */
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     /* Subtle reflection effect */
     position: relative;
@@ -184,31 +184,7 @@
     opacity: 0.8;
   }
 
-  /* Subtle refraction effect on child buttons */
-  .glass-nav > button {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .glass-nav > button::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.3),
-      transparent
-    );
-    transition: left 0.5s ease;
-  }
-
-  .glass-nav > button:hover::after {
-    left: 100%;
-  }
+  /* Removed decorative shimmer effect - not purposeful per Denis Jeliazkov's principle */
 
   /* Button Styles */
   .btn-primary {

@@ -13,20 +13,20 @@ export default function SuccessAnimation({ show, onComplete }: SuccessAnimationP
   useEffect(() => {
     if (show) {
       // Generate confetti particles
-      const newParticles = Array.from({ length: 30 }, (_, i) => ({
+      const newParticles = Array.from({ length: 20 }, (_, i) => ({
         id: i,
-        x: Math.random() * 100 - 50, // -50 to 50
-        y: Math.random() * -100 - 50, // -50 to -150
-        delay: Math.random() * 0.2,
-        duration: 0.8 + Math.random() * 0.4,
+        x: Math.random() * 80 - 40, // -40 to 40
+        y: Math.random() * -60 - 30, // -30 to -90
+        delay: Math.random() * 0.1,
+        duration: 0.4 + Math.random() * 0.2, // 400-600ms
       }));
       setParticles(newParticles);
 
-      // Auto-hide after animation
+      // Auto-hide after animation (500ms total)
       const timeout = setTimeout(() => {
         setParticles([]);
         onComplete?.();
-      }, 1500);
+      }, 500);
 
       return () => clearTimeout(timeout);
     }

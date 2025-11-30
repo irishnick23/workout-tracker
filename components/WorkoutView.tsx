@@ -74,10 +74,10 @@ export default function WorkoutView() {
     // Show success animation
     setShowSuccess(true);
 
-    // Complete workout after a short delay
+    // Complete workout after animation (500ms)
     setTimeout(async () => {
       await completeWorkout();
-    }, 800);
+    }, 500);
   };
 
   const selectedExerciseData = selectedExercise
