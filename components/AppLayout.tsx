@@ -9,6 +9,7 @@ import { haptics } from '@/lib/haptics';
 import AuthForm from './AuthForm';
 import WorkoutView from './WorkoutView';
 import ProgressView from './ProgressView';
+import BearLoader from './BearLoader';
 
 type Tab = 'train' | 'progress';
 
@@ -89,10 +90,7 @@ export default function AppLayout() {
   if (!dataLoaded) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <div className="mb-4 h-12 w-12 mx-auto animate-spin rounded-full border-4 border-gray-200 border-t-black"></div>
-          <div className="text-gray-600">Loading your workouts...</div>
-        </div>
+        <BearLoader message="Loading your workouts..." size="lg" />
       </div>
     );
   }
