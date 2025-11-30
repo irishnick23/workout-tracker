@@ -140,7 +140,7 @@ export default function ProgressView() {
             No workouts completed yet. Start your first session!
           </div>
         ) : (
-          <div className="space-y-3">
+          <div>
             {workoutHistory.slice(-10).reverse().map((workout, idx) => {
               const date = new Date(workout.date).toLocaleDateString();
 
@@ -152,7 +152,7 @@ export default function ProgressView() {
                 return (
                   <div
                     key={idx}
-                    className="flex items-center justify-between border-b border-border pb-3 last:border-0"
+                    className="flex items-center justify-between py-3 border-b border-border last:border-0"
                   >
                     <div>
                       <div className="font-medium">Weight Override: {exerciseName}</div>
@@ -172,7 +172,7 @@ export default function ProgressView() {
               return (
                 <div
                   key={idx}
-                  className="flex items-center justify-between border-b border-border pb-3 last:border-0"
+                  className="flex items-center justify-between py-3 border-b border-border last:border-0"
                 >
                   <div>
                     <div className="font-medium">{workoutName}</div>
