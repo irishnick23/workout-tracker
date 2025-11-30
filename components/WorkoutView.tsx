@@ -136,50 +136,12 @@ export default function WorkoutView() {
                 disabled={result !== undefined}
                 className="card-clean card-hover w-full p-5 text-left disabled:opacity-60 disabled:hover:shadow-[var(--shadow-soft)] transition-smooth group"
               >
-                <div className="flex items-center gap-4">
-                  {/* Status Indicator - Left side for thumb zone */}
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    result === undefined
-                      ? 'border-2 border-border'
-                      : result === true
-                      ? 'bg-primary'
-                      : 'bg-destructive'
-                  }`}>
-                    {result === true && (
-                      <svg
-                        className="h-6 w-6"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={3}
-                        viewBox="0 0 24 24"
-                        stroke="white"
-                      >
-                        <path d="M5 13l4 4L19 7" />
-                      </svg>
-                    )}
-                    {result === false && (
-                      <svg
-                        className="h-6 w-6"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={3}
-                        viewBox="0 0 24 24"
-                        stroke="white"
-                      >
-                        <path d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    )}
-                  </div>
-
+                <div className="flex items-center">
                   {/* Exercise info */}
-                  <div className="flex-1 space-y-1">
-                    <div className="flex items-baseline gap-2">
-                      <h3 className="font-semibold text-base text-muted-foreground">
-                        {exercise.name}
-                      </h3>
-                    </div>
+                  <div className="flex-[2] space-y-1">
+                    <h3 className="font-semibold text-lg">
+                      {exercise.name}
+                    </h3>
                     <div className="text-3xl font-bold text-foreground leading-none">
                       {exercise.key === 'pullups'
                         ? weight === 0
@@ -191,6 +153,44 @@ export default function WorkoutView() {
                       <span>{exercise.sets}</span>
                       <span>•</span>
                       <span>{exerciseInfo.rest}</span>
+                    </div>
+                  </div>
+
+                  {/* Status Indicator */}
+                  <div className="flex-1 flex items-center justify-center">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                      result === undefined
+                        ? 'border-2 border-border'
+                        : result === true
+                        ? 'bg-primary'
+                        : 'bg-destructive'
+                    }`}>
+                      {result === true && (
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={3}
+                          viewBox="0 0 24 24"
+                          stroke="white"
+                        >
+                          <path d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                      {result === false && (
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={3}
+                          viewBox="0 0 24 24"
+                          stroke="white"
+                        >
+                          <path d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      )}
                     </div>
                   </div>
                 </div>
