@@ -90,14 +90,26 @@ export default function ProgressView() {
             return (
               <div
                 key={exercise}
-                className="flex items-center justify-between border-b border-border pb-3 last:border-0"
+                className="flex items-center justify-between py-3 border-b border-border last:border-0"
               >
-                <div className="font-medium">{displayName}</div>
-                <div className="flex items-center gap-3">
-                  <span className="font-bold">{key === 'pullups' ? (weight === 0 ? weight : `+${weight}`) : weight} lbs</span>
-                  <span className={`text-sm px-2 py-1 rounded ${progressColor} ${difference === 0 ? 'bg-muted/30' : 'bg-primary/10'}`}>
-                    {difference > 0 ? `+${difference}` : difference} lbs
-                  </span>
+                <div className="text-sm text-muted-foreground">{displayName}</div>
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl font-bold">{key === 'pullups' ? (weight === 0 ? weight : `+${weight}`) : weight}</span>
+                  <span className="text-sm text-muted-foreground">lbs</span>
+                  {difference !== 0 && (
+                    <span className={`ml-1 flex items-center gap-1 text-sm font-medium ${progressColor}`}>
+                      {difference > 0 ? (
+                        <svg className="h-4 w-4" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} viewBox="0 0 24 24" stroke="currentColor">
+                          <path d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                        </svg>
+                      ) : (
+                        <svg className="h-4 w-4" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} viewBox="0 0 24 24" stroke="currentColor">
+                          <path d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                        </svg>
+                      )}
+                      {Math.abs(difference)}
+                    </span>
+                  )}
                 </div>
               </div>
             );

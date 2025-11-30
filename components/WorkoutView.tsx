@@ -136,59 +136,61 @@ export default function WorkoutView() {
                 disabled={result !== undefined}
                 className="card-clean card-hover w-full p-5 text-left disabled:opacity-60 disabled:hover:shadow-[var(--shadow-soft)] transition-smooth group"
               >
-                <div className="flex items-center">
-                  <div className="flex-[2] space-y-2">
-                    <h3 className="font-semibold text-base">
-                      {exercise.name}
-                    </h3>
-                    <div className="text-2xl font-bold text-foreground">
+                <div className="flex items-center gap-4">
+                  {/* Status Indicator - Left side for thumb zone */}
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${
+                    result === undefined
+                      ? 'border-2 border-border'
+                      : result === true
+                      ? 'bg-primary'
+                      : 'bg-destructive'
+                  }`}>
+                    {result === true && (
+                      <svg
+                        className="h-6 w-6"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={3}
+                        viewBox="0 0 24 24"
+                        stroke="white"
+                      >
+                        <path d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                    {result === false && (
+                      <svg
+                        className="h-6 w-6"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={3}
+                        viewBox="0 0 24 24"
+                        stroke="white"
+                      >
+                        <path d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    )}
+                  </div>
+
+                  {/* Exercise info */}
+                  <div className="flex-1 space-y-1">
+                    <div className="flex items-baseline gap-2">
+                      <h3 className="font-semibold text-base text-muted-foreground">
+                        {exercise.name}
+                      </h3>
+                    </div>
+                    <div className="text-3xl font-bold text-foreground leading-none">
                       {exercise.key === 'pullups'
                         ? weight === 0
                           ? 'Bodyweight'
                           : `+${weight} lbs`
                         : `${weight} lbs`}
                     </div>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
                       <span>{exercise.sets}</span>
+                      <span>•</span>
                       <span>{exerciseInfo.rest}</span>
-                    </div>
-                  </div>
-
-                  {/* Status Indicator */}
-                  <div className="flex-1 flex items-center justify-center">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      result === undefined
-                        ? 'border-2 border-border'
-                        : result === true
-                        ? 'bg-primary'
-                        : 'bg-destructive'
-                    }`}>
-                      {result === true && (
-                        <svg
-                          className="h-5 w-5"
-                          fill="none"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={3}
-                          viewBox="0 0 24 24"
-                          stroke="white"
-                        >
-                          <path d="M5 13l4 4L19 7" />
-                        </svg>
-                      )}
-                      {result === false && (
-                        <svg
-                          className="h-5 w-5"
-                          fill="none"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={3}
-                          viewBox="0 0 24 24"
-                          stroke="white"
-                        >
-                          <path d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      )}
                     </div>
                   </div>
                 </div>
@@ -215,18 +217,11 @@ export default function WorkoutView() {
       >
         {selectedExerciseData && selectedExerciseInfo && (
           <div className="space-y-6">
-            {/* Rest Time Info */}
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground">
-                Rest: {selectedExerciseInfo.rest}
-              </p>
-            </div>
-
             {/* Weight and Sets Display */}
             <div className="grid grid-cols-2 gap-4">
               {/* Weight Input */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-muted-foreground">
+                <label className="mb-2 block text-xs text-muted-foreground uppercase tracking-wide">
                   Weight
                 </label>
                 <div className="relative">
@@ -234,10 +229,10 @@ export default function WorkoutView() {
                     type="number"
                     value={editedWeight}
                     onChange={(e) => setEditedWeight(e.target.value)}
-                    className="h-[68px] w-full rounded-lg border border-input bg-muted/30 px-4 text-center text-2xl font-bold focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    className="h-20 w-full rounded-lg border border-input bg-muted/30 px-4 text-center text-3xl font-bold focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                     placeholder="0"
                   />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none">
+                  <span className="absolute right-3 bottom-2 text-xs text-muted-foreground pointer-events-none">
                     lbs
                   </span>
                 </div>
@@ -245,10 +240,10 @@ export default function WorkoutView() {
 
               {/* Sets Display */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-muted-foreground">
-                  Sets
+                <label className="mb-2 block text-xs text-muted-foreground uppercase tracking-wide">
+                  Sets • {selectedExerciseInfo.rest}
                 </label>
-                <div className="flex h-[68px] items-center justify-center rounded-lg border border-input bg-muted/30 text-2xl font-bold">
+                <div className="flex h-20 items-center justify-center rounded-lg border border-input bg-muted/30 text-3xl font-bold">
                   {selectedExerciseData.sets}
                 </div>
               </div>
