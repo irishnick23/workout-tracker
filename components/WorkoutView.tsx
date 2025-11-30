@@ -141,8 +141,8 @@ export default function WorkoutView() {
                 disabled={result !== undefined}
                 className="card-clean card-hover w-full p-5 text-left disabled:opacity-60 disabled:hover:shadow-[var(--shadow-soft)] transition-smooth group"
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 space-y-2">
+                <div className="flex items-center">
+                  <div className="flex-[2] space-y-2">
                     <h3 className="font-semibold text-base">
                       {exercise.name}
                     </h3>
@@ -160,7 +160,7 @@ export default function WorkoutView() {
                   </div>
 
                   {/* Status Indicator */}
-                  <div className="ml-4 flex items-center gap-3">
+                  <div className="flex-1 flex items-center justify-center">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                       result === undefined
                         ? 'border-2 border-border'
