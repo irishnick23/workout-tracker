@@ -203,11 +203,13 @@ export default function WorkoutView() {
         </div>
 
         {/* Complete Workout Button */}
-        {allExercisesCompleted && (
-          <button onClick={handleComplete} className="btn-primary">
-            Complete Workout
-          </button>
-        )}
+        <button
+          onClick={handleComplete}
+          disabled={!allExercisesCompleted}
+          className="btn-primary"
+        >
+          Complete Workout
+        </button>
       </div>
 
       {/* Exercise Log Bottom Sheet */}
