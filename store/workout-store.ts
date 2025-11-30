@@ -91,14 +91,7 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
         [exercise]: success,
       },
     }));
-
-    // Track in weekly results
-    set((state) => ({
-      weeklyResults: {
-        ...state.weeklyResults,
-        [exercise]: [...(state.weeklyResults[exercise] || []), success],
-      },
-    }));
+    // Note: Weekly results are only updated when workout is completed
   },
 
   completeWorkout: async () => {
@@ -110,9 +103,17 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
       weekNumber: state.getCurrentWeek(),
     };
 
+    // Add workout results to weekly results tracking
+    const newWeeklyResults = { ...state.weeklyResults };
+    Object.entries(state.workoutResults).forEach(([exercise, success]) => {
+      const key = exercise as ExerciseKey;
+      newWeeklyResults[key] = [...(newWeeklyResults[key] || []), success];
+    });
+
     set((s) => ({
       workoutHistory: [...s.workoutHistory, workout],
       sessionCount: s.sessionCount + 1,
+      weeklyResults: newWeeklyResults,
     }));
 
     // Check if week is complete and process results
