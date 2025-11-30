@@ -101,17 +101,12 @@ export default function WorkoutView() {
       <div className="space-y-8">
         {/* Workout Header */}
         <div className="space-y-1">
-          <div className="flex items-center gap-3">
-            <h2 className="text-3xl font-bold">
-              {currentWorkout.name.split(' ').slice(0, 2).join(' ')}{' '}
-              <span className="text-muted-foreground">
-                {currentWorkout.name.split(' ').slice(2).join(' ')}
-              </span>
-            </h2>
-            {!allExercisesCompleted && (
-              <span className="badge-success">Active</span>
-            )}
-          </div>
+          <h2 className="text-3xl font-bold">
+            {currentWorkout.name.split(' ').slice(0, 2).join(' ')}{' '}
+            <span className="text-muted-foreground">
+              {currentWorkout.name.split(' ').slice(2).join(' ')}
+            </span>
+          </h2>
           <p className="text-sm text-muted-foreground">
             Week {weekNumber} • Session {sessionWithinWeek}
           </p>
