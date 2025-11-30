@@ -3,8 +3,10 @@
 import { useState } from 'react';
 import { useWorkoutStore } from '@/store/workout-store';
 import { EXERCISE_INFO } from '@/lib/constants';
+import { haptics } from '@/lib/haptics';
 import type { ExerciseKey } from '@/types';
 import BottomSheet from './BottomSheet';
+import SuccessAnimation from './SuccessAnimation';
 
 export default function WorkoutView() {
   const {
@@ -21,6 +23,7 @@ export default function WorkoutView() {
 
   const [selectedExercise, setSelectedExercise] = useState<ExerciseKey | null>(null);
   const [editedWeight, setEditedWeight] = useState<string>('');
+  const [showSuccess, setShowSuccess] = useState(false);
 
   if (!currentWorkout) return null;
 
@@ -41,6 +44,9 @@ export default function WorkoutView() {
   const handleHit = async () => {
     if (!selectedExercise) return;
 
+    // Haptic feedback for success
+    haptics.success();
+
     // If weight was edited, update it (mid-workout adjustment)
     const newWeight = parseInt(editedWeight);
     if (!isNaN(newWeight) && newWeight !== currentWeights[selectedExercise]) {
@@ -53,12 +59,25 @@ export default function WorkoutView() {
 
   const handleMissed = () => {
     if (!selectedExercise) return;
+
+    // Haptic feedback for error
+    haptics.error();
+
     recordResult(selectedExercise, false);
     closeSheet();
   };
 
   const handleComplete = async () => {
-    await completeWorkout();
+    // Celebration haptic feedback
+    haptics.celebration();
+
+    // Show success animation
+    setShowSuccess(true);
+
+    // Complete workout after a short delay
+    setTimeout(async () => {
+      await completeWorkout();
+    }, 800);
   };
 
   const selectedExerciseData = selectedExercise
@@ -77,6 +96,8 @@ export default function WorkoutView() {
 
   return (
     <>
+      <SuccessAnimation show={showSuccess} onComplete={() => setShowSuccess(false)} />
+
       <div className="space-y-8">
         {/* Workout Header */}
         <div className="space-y-1">
@@ -121,21 +142,19 @@ export default function WorkoutView() {
                 className="card-clean card-hover w-full p-5 text-left disabled:opacity-60 disabled:hover:shadow-[var(--shadow-soft)] transition-smooth group"
               >
                 <div className="flex items-start justify-between">
-                  <div className="flex-1 space-y-1">
+                  <div className="flex-1 space-y-2">
                     <h3 className="font-semibold text-base">
                       {exercise.name}
                     </h3>
-                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                      <span className="font-medium text-foreground">
-                        {exercise.key === 'pullups'
-                          ? weight === 0
-                            ? 'Bodyweight'
-                            : `+${weight} lbs`
-                          : `${weight} lbs`}
-                      </span>
-                      <span style={{ color: 'hsl(var(--border))' }}>•</span>
+                    <div className="text-2xl font-bold text-foreground">
+                      {exercise.key === 'pullups'
+                        ? weight === 0
+                          ? 'Bodyweight'
+                          : `+${weight} lbs`
+                        : `${weight} lbs`}
+                    </div>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
                       <span>{exercise.sets}</span>
-                      <span style={{ color: 'hsl(var(--border))' }}>•</span>
                       <span>{exerciseInfo.rest}</span>
                     </div>
                   </div>
