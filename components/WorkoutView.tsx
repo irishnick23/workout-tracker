@@ -135,6 +135,7 @@ export default function WorkoutView() {
                 onClick={() => openExerciseSheet(exercise.key)}
                 disabled={result !== undefined}
                 className="card-clean card-hover w-full p-5 text-left disabled:opacity-60 disabled:hover:shadow-[var(--shadow-soft)] transition-smooth group"
+                aria-label={`${exercise.name}, ${weight} lbs, ${exercise.sets}, ${exerciseInfo.rest}${result !== undefined ? (result ? ' - Completed' : ' - Missed') : ''}`}
               >
                 <div className="flex items-center">
                   {/* Exercise info */}
@@ -221,11 +222,12 @@ export default function WorkoutView() {
             <div className="grid grid-cols-2 gap-4">
               {/* Weight Input */}
               <div>
-                <label className="mb-2 block text-xs text-muted-foreground uppercase tracking-wide">
+                <label htmlFor="weight-input" className="mb-2 block text-xs text-muted-foreground uppercase tracking-wide">
                   Weight
                 </label>
                 <div className="relative">
                   <input
+                    id="weight-input"
                     type="number"
                     inputMode="numeric"
                     pattern="[0-9]*"
@@ -234,8 +236,10 @@ export default function WorkoutView() {
                     className="h-20 w-full rounded-lg border border-input bg-muted/30 text-center font-bold focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                     style={{ fontSize: '2rem', lineHeight: '80px' }}
                     placeholder=""
+                    aria-label="Weight in pounds"
+                    aria-describedby="weight-unit"
                   />
-                  <span className="absolute right-3 bottom-2 text-xs text-muted-foreground pointer-events-none">
+                  <span id="weight-unit" className="absolute right-3 bottom-2 text-xs text-muted-foreground pointer-events-none">
                     lbs
                   </span>
                 </div>
@@ -246,7 +250,7 @@ export default function WorkoutView() {
                 <label className="mb-2 block text-xs text-muted-foreground uppercase tracking-wide">
                   Sets • {selectedExerciseInfo.rest}
                 </label>
-                <div className="flex h-20 items-center justify-center rounded-lg border border-input bg-muted/30 font-bold" style={{ fontSize: '2rem' }}>
+                <div className="flex h-20 items-center justify-center rounded-lg border border-input bg-muted/30 font-bold" style={{ fontSize: '2rem' }} role="text" aria-label={`${selectedExerciseData.sets} sets with ${selectedExerciseInfo.rest} rest`}>
                   {selectedExerciseData.sets}
                 </div>
               </div>

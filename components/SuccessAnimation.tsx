@@ -35,7 +35,7 @@ export default function SuccessAnimation({ show, onComplete }: SuccessAnimationP
   if (!show && particles.length === 0) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] pointer-events-none flex items-center justify-center">
+    <div className="fixed inset-0 z-[100] pointer-events-none flex items-center justify-center" role="status" aria-live="polite">
       {/* Success checkmark */}
       <div className="success-checkmark">
         <svg
@@ -46,6 +46,7 @@ export default function SuccessAnimation({ show, onComplete }: SuccessAnimationP
           strokeWidth={3}
           viewBox="0 0 24 24"
           stroke="currentColor"
+          aria-label="Workout completed successfully"
         >
           <circle cx="12" cy="12" r="10" fill="white" stroke="currentColor" strokeWidth={2} />
           <path d="M9 12l2 2 4-4" />

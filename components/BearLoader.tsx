@@ -13,7 +13,7 @@ export default function BearLoader({ message = 'Loading...', size = 'md' }: Bear
   };
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4">
+    <div className="flex flex-col items-center justify-center gap-4" role="status" aria-live="polite">
       <div className="bear-pulse">
         <img
           src="/workout-bear-icon-180.svg"

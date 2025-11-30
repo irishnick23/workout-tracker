@@ -18,7 +18,7 @@
     /* Muted/Secondary */
     --secondary: 240 5% 96%;
     --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 46%;
+    --muted-foreground: 240 5% 40%;  /* Darkened from 46% to 40% for WCAG AA contrast */
 
     /* Borders */
     --border: 240 6% 90%;
