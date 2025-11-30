@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useAuthStore } from '@/store/auth-store';
 import { useWorkoutStore } from '@/store/workout-store';
 import { supabase } from '@/lib/supabase';
 import { loadWorkoutData, saveWorkoutState, saveWorkoutHistory } from '@/lib/db';
+import { haptics } from '@/lib/haptics';
 import AuthForm from './AuthForm';
 import WorkoutView from './WorkoutView';
 import ProgressView from './ProgressView';
@@ -16,6 +17,12 @@ export default function AppLayout() {
   const { initWorkout, loadState, workoutHistory, currentWorkout } = useWorkoutStore();
   const [activeTab, setActiveTab] = useState<Tab>('train');
   const [dataLoaded, setDataLoaded] = useState(false);
+
+  // Swipe gesture state
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   // Initialize auth state
   useEffect(() => {
@@ -97,6 +104,44 @@ export default function AppLayout() {
     return 'Progress';
   };
 
+  // Swipe gesture handlers
+  const minSwipeDistance = 50; // minimum swipe distance in pixels
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe && activeTab === 'train') {
+      // Swipe left: Train → Progress
+      haptics.light();
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setActiveTab('progress');
+        setIsTransitioning(false);
+      }, 150);
+    } else if (isRightSwipe && activeTab === 'progress') {
+      // Swipe right: Progress → Train
+      haptics.light();
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setActiveTab('train');
+        setIsTransitioning(false);
+      }, 150);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background pb-32">
       {/* Header */}
@@ -124,8 +169,16 @@ export default function AppLayout() {
       </header>
 
       {/* Content */}
-      <main className="mx-auto max-w-2xl px-5 py-8">
-        {activeTab === 'train' ? <WorkoutView /> : <ProgressView />}
+      <main
+        ref={contentRef}
+        className="mx-auto max-w-2xl px-5 py-8"
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
+        <div className={`transition-opacity duration-150 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
+          {activeTab === 'train' ? <WorkoutView /> : <ProgressView />}
+        </div>
       </main>
 
       {/* Glass Bottom Navigation */}
