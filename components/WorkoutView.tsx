@@ -231,7 +231,7 @@ export default function WorkoutView() {
                     pattern="[0-9]*"
                     value={editedWeight}
                     onChange={(e) => setEditedWeight(e.target.value)}
-                    className="h-20 w-full rounded-lg border border-input bg-muted/30 pr-12 text-center font-bold focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    className="h-20 w-full rounded-lg border border-input bg-muted/30 text-center font-bold focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                     style={{ fontSize: '2rem', lineHeight: '80px' }}
                     placeholder=""
                   />
