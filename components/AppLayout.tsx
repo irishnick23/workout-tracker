@@ -169,8 +169,8 @@ export default function AppLayout() {
       {/* Content */}
       <main
         ref={contentRef}
-        className="mx-auto max-w-2xl px-5 py-8"
-        style={{ paddingTop: 'calc(env(safe-area-inset-top) + 76px)' }}
+        className="mx-auto max-w-2xl px-5 pt-4 pb-8"
+        style={{ paddingTop: 'calc(env(safe-area-inset-top) + 76px + 1rem)' }}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
